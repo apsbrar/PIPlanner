@@ -37,6 +37,7 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this._grid = new Zuby.ADGV.AdvancedDataGridView();
             this.bindingSource_main = new System.Windows.Forms.BindingSource(this.components);
+            this.btnLoadPreviousFilter = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this._grid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource_main)).BeginInit();
             this.SuspendLayout();
@@ -62,7 +63,7 @@
             // btnSelectAll
             // 
             this.btnSelectAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelectAll.Location = new System.Drawing.Point(449, 5);
+            this.btnSelectAll.Location = new System.Drawing.Point(449, 10);
             this.btnSelectAll.Name = "btnSelectAll";
             this.btnSelectAll.Size = new System.Drawing.Size(75, 23);
             this.btnSelectAll.TabIndex = 8;
@@ -115,6 +116,16 @@
             this._grid.TabIndex = 11;
             this._grid.FilterStringChanged += new System.EventHandler(this._grid_FilterStringChanged);
             // 
+            // btnLoadPreviousFilter
+            // 
+            this.btnLoadPreviousFilter.Location = new System.Drawing.Point(12, 305);
+            this.btnLoadPreviousFilter.Name = "btnLoadPreviousFilter";
+            this.btnLoadPreviousFilter.Size = new System.Drawing.Size(136, 23);
+            this.btnLoadPreviousFilter.TabIndex = 12;
+            this.btnLoadPreviousFilter.Text = "Load Previous Filter";
+            this.btnLoadPreviousFilter.UseVisualStyleBackColor = true;
+            this.btnLoadPreviousFilter.Click += new System.EventHandler(this.btnLoadPreviousFilter_Click);
+            // 
             // IterationPicker
             // 
             this.AcceptButton = this.btnOk;
@@ -122,13 +133,17 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(536, 340);
+            this.Controls.Add(this.btnLoadPreviousFilter);
             this.Controls.Add(this._grid);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.btnSelectAll);
             this.Controls.Add(this.Projects);
             this.Controls.Add(this.LabelProjects);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "IterationPicker";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Iteration Picker";
@@ -149,5 +164,6 @@
         private System.Windows.Forms.Button btnCancel;
         private Zuby.ADGV.AdvancedDataGridView _grid;
         private System.Windows.Forms.BindingSource bindingSource_main;
+        private System.Windows.Forms.Button btnLoadPreviousFilter;
     }
 }

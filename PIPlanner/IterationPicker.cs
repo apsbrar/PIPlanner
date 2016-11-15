@@ -81,8 +81,8 @@ namespace PIPlanner
             bindingSource_main.DataMember = _dataTable.TableName;
             _grid.DataSource = bindingSource_main;
             _grid.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-
-            btnSelectAll.Visible = _dataTable.Rows.Count > 0;
+                     
+             btnSelectAll.Visible = _dataTable.Rows.Count > 0;
 
         }
 
@@ -130,6 +130,9 @@ namespace PIPlanner
 
         private void btnOk_Click(object sender, EventArgs e)
         {
+            Properties.Settings.Default.LastProject = Projects.SelectedItem.ToString();
+            Properties.Settings.Default.LastFilter = _grid.FilterString;
+            Properties.Settings.Default.Save();
             this.Close();
         }
 
@@ -141,6 +144,28 @@ namespace PIPlanner
         private void _grid_FilterStringChanged(object sender, EventArgs e)
         {
             bindingSource_main.Filter = _grid.FilterString;
+        }
+
+        private void btnLoadPreviousFilter_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.LastProject) &&
+                       !string.IsNullOrWhiteSpace(Properties.Settings.Default.LastFilter))
+                {
+                    int index = Projects.FindStringExact(Properties.Settings.Default.LastProject);
+                    Projects.SelectedIndex = index;
+                    _grid.LoadFilterAndSort(Properties.Settings.Default.LastFilter, "");
+                    _grid.EnableFilterAndSort(_grid.Columns[0]);
+                    _grid.EnableFilterAndSort(_grid.Columns[1]);
+                    btnSelectAll_Click(null, null);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.Message);
+            }
         }
 
     }

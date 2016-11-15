@@ -108,5 +108,16 @@ namespace PIPlanner
             string s = lbWorkItems.Items[index].ToString();
             System.Windows.Forms.DragDropEffects dde1 = DoDragDrop(s, System.Windows.Forms.DragDropEffects.All);
         }
+
+        private void btnRefreshBoard_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+            var selections = _selectedIterationsGrid.DataSource as List<IterationSelection>;
+
+            SetIterationsGrid(selections);
+
+            TableHelper.SetTable(selections, _table, tfs);
+            this.Cursor = Cursors.Default;
+        }
     }
 }

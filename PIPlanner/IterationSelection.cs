@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace PIPlanner
 {
-    internal class IterationSelection
+    [Serializable]
+    public class IterationSelection
     {
         public bool IsSelected { get; set; }
         public string Iteration { get; set; }
