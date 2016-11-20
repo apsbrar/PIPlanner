@@ -105,11 +105,10 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._grid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._grid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+            this._grid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this._grid.FilterAndSortEnabled = true;
             this._grid.Location = new System.Drawing.Point(12, 39);
             this._grid.Name = "_grid";
-            this._grid.ReadOnly = true;
             this._grid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this._grid.ShowEditingIcon = false;
             this._grid.Size = new System.Drawing.Size(512, 260);

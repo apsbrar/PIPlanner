@@ -35,9 +35,9 @@ namespace PIPlanner
             get { return (from Project proj in store.Projects select proj.Name).ToList(); }
         }
 
-        public ICollection<string> GetIterationPaths(string projectName)
+        public ICollection<Iteration> GetIterationPaths(string projectName)
         {
-            var result = new List<string>();
+            var result = new List<Iteration>();
 
             foreach (Project project in store.Projects.Cast<Project>().
                 Where(project => string.Compare(project.Name, projectName, StringComparison.OrdinalIgnoreCase) == 0))
@@ -45,7 +45,7 @@ namespace PIPlanner
                 foreach (Node node in project.IterationRootNodes)
                 {
                     string path = project.Name + "\\" + node.Name;
-                    result.Add(path);
+                    result.Add(new Iteration(node.Id, path));
                     RecursiveAddIterationPath(node, result, path);
                 }
 
@@ -55,12 +55,12 @@ namespace PIPlanner
             return result;
         }
 
-        private static void RecursiveAddIterationPath(Node node, ICollection<string> result, string parentIterationName)
+        private static void RecursiveAddIterationPath(Node node, ICollection<Iteration> result, string parentIterationName)
         {
             foreach (Node item in node.ChildNodes)
             {
                 string path = parentIterationName + "\\" + item.Name;
-                result.Add(path);
+                result.Add(new Iteration(item.Id, path));
                 if (item.HasChildNodes)
                 {
                     RecursiveAddIterationPath(item, result, path);
@@ -68,15 +68,29 @@ namespace PIPlanner
             }
         }
 
-        public ICollection<string> GetWorkItemsInIterationPath(string iterationPath)
+        public ICollection<WorkItem> GetWorkItemsUnerIterationPath(string iterationPath)
         {
-            ICollection<string> result = new Collection<string>();
+            ICollection<WorkItem> result = new Collection<WorkItem>();
             string query = string.Format(CultureInfo.CurrentCulture,
-                                         "SELECT [System.Id], [System.Title] FROM WorkItems WHERE [System.IterationPath] UNDER '{0}'",
+                                         "SELECT [System.Id], [System.IterationId], [System.IterationPath], [System.Title] FROM WorkItems WHERE [System.IterationPath] UNDER '{0}'",
+                                         iterationPath);      
+            foreach (WorkItem item in store.Query(query))
+            {
+                result.Add(item);
+            }
+
+            return result;
+        }
+
+        public ICollection<WorkItem> GetWorkItemsInIterationPath(string iterationPath)
+        {
+            ICollection<WorkItem> result = new Collection<WorkItem>();
+            string query = string.Format(CultureInfo.CurrentCulture,
+                                         "SELECT [System.Id], [System.IterationId], [System.IterationPath], [System.Title] FROM WorkItems WHERE [System.IterationPath] = '{0}'",
                                          iterationPath);
             foreach (WorkItem item in store.Query(query))
             {
-                result.Add(item.Fields["System.Id"].Value + ":" + item.Fields["System.Title"].Value);
+                result.Add(item);
             }
 
             return result;

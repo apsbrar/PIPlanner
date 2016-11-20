@@ -10,8 +10,10 @@ namespace PIPlanner
     public class IterationSelection
     {
         public bool IsSelected { get; set; }
-        public string Iteration { get; set; }
+        public Iteration Iteration { get; set; }
 
-        public List<string> SubIterations { get; set; }
+        public string Path { get { return Iteration.Path; } }
+
+        public List<Iteration> SubIterations { get; set; }
     }
 }

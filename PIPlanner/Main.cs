@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Drawing;
@@ -12,6 +13,7 @@ namespace PIPlanner
     {
         private Tfs tfs;
         Grid _table = new Grid();
+        System.Windows.Controls.ListView lvWorkItems = new System.Windows.Controls.ListView();
 
         public Main()
         {
@@ -26,6 +28,11 @@ namespace PIPlanner
             _table.ShowGridLines = true;
 
             _selectedIterationsGrid.SelectionChanged += _selectedIterationsGrid_SelectionChanged;
+
+            elementHost2.Child = lvWorkItems;
+            lvWorkItems.Name = "lvWorkItems";
+            lvWorkItems.PreviewMouseLeftButtonDown += TableHelper.lv_PreviewMouseLeftButtonDown;
+            lvWorkItems.PreviewMouseMove += TableHelper.lv_PreviewMouseMove;
         }
 
 
@@ -68,7 +75,7 @@ namespace PIPlanner
             }
             catch (Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show("Could not connect : " + ex.Message);
+                System.Windows.Forms.MessageBox.Show("Could not connect : " + ex.Message + System.Environment.NewLine + ex.StackTrace);
                 System.Windows.Forms.Application.Exit();
             }
 
@@ -80,36 +87,31 @@ namespace PIPlanner
 
             if (_selectedIterationsGrid.Columns.Count > 0)
             {
-                _selectedIterationsGrid.Columns[0].Visible = false;
-                _selectedIterationsGrid.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                _selectedIterationsGrid.Columns["IsSelected"].Visible = false;
+                _selectedIterationsGrid.Columns["Iteration"].Visible = false;
+                _selectedIterationsGrid.Columns["Path"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             }
         }
 
         void _selectedIterationsGrid_SelectionChanged(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
-            lbWorkItems.Items.Clear();
+            lvWorkItems.Items.Clear();
+
             foreach (DataGridViewRow row in _selectedIterationsGrid.SelectedRows)
             {
-                foreach (var workItem in tfs.GetWorkItemsInIterationPath((string)row.Cells[1].Value))
+                var val = row.Cells["Path"].Value;
+                foreach (var workItem in tfs.GetWorkItemsInIterationPath((string)val))
                 {
-                    lbWorkItems.Items.Add(workItem);
+                    TableHelper.AddWorkItemToSprint(lvWorkItems, workItem);
                 }
+
             }
             this.Cursor = Cursors.Default;
         }
 
-        private void lbWorkItems_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (lbWorkItems.Items.Count == 0)
-                return;
 
-            int index = lbWorkItems.IndexFromPoint(e.X, e.Y);
-            string s = lbWorkItems.Items[index].ToString();
-            System.Windows.Forms.DragDropEffects dde1 = DoDragDrop(s, System.Windows.Forms.DragDropEffects.All);
-        }
-
-        private void btnRefreshBoard_Click(object sender, EventArgs e)
+        private void btnRefresh_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
             var selections = _selectedIterationsGrid.DataSource as List<IterationSelection>;
@@ -117,6 +119,8 @@ namespace PIPlanner
             SetIterationsGrid(selections);
 
             TableHelper.SetTable(selections, _table, tfs);
+
+            _selectedIterationsGrid_SelectionChanged(null, null);
             this.Cursor = Cursors.Default;
         }
     }

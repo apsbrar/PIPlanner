@@ -27,6 +27,7 @@ namespace PIPlanner
             _dataTable = _dataSet.Tables.Add("IterationSelection");
             _dataTable.Columns.Add(new DataColumn("IsSelected", typeof(bool)));
             _dataTable.Columns.Add(new DataColumn("Iteration", typeof(string)));
+            _dataTable.Columns.Add(new DataColumn("Id", typeof(int)));
             _dataTable.Columns[0].DefaultValue = false;
 
             _tfs = tfs;
@@ -72,18 +73,18 @@ namespace PIPlanner
 
             var item = (string)Projects.SelectedItem;
             _dataTable.Rows.Clear();
-            foreach (string path in _tfs.GetIterationPaths(item))
+            foreach (var iteration in _tfs.GetIterationPaths(item))
             {
-                _dataTable.Rows.Add(false, path);
+                _dataTable.Rows.Add(false, iteration.Path, iteration.Id);
             }
 
             bindingSource_main.DataSource = _dataSet;
             bindingSource_main.DataMember = _dataTable.TableName;
             _grid.DataSource = bindingSource_main;
             _grid.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                     
-             btnSelectAll.Visible = _dataTable.Rows.Count > 0;
+            _grid.Columns[1].ReadOnly = true;
 
+            btnSelectAll.Visible = _dataTable.Rows.Count > 0;
         }
 
 
@@ -99,15 +100,15 @@ namespace PIPlanner
                                             .Select(r => new IterationSelection()
                                             {
                                                 IsSelected = r.Field<bool>("IsSelected"),
-                                                Iteration = r.Field<string>("Iteration")
+                                                Iteration = new Iteration(r.Field<int>("Id"), r.Field<string>("Iteration"))
 
                                             }).ToList();
 
                     foreach (var parentIteration in parentIterations)
                     {
                         var childIterations = rows
-                                                .Where(r => r.Field<string>("Iteration").IndexOf(parentIteration.Iteration + @"\") > -1)
-                                                .Select(r => r.Field<string>("Iteration")).ToList();
+                            .Where(r => r.Field<string>("Iteration").IndexOf(parentIteration.Iteration.Path + @"\") > -1)
+                            .Select(r => new Iteration(r.Field<int>("Id"), r.Field<string>("Iteration"))).ToList();
                         parentIteration.SubIterations = childIterations;
                     }
 

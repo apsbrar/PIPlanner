@@ -31,11 +31,11 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.label1 = new System.Windows.Forms.Label();
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.lbWorkItems = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
             this._selectedIterationsGrid = new System.Windows.Forms.DataGridView();
-            this.btnRefreshBoard = new System.Windows.Forms.Button();
+            this.btnRefresh = new System.Windows.Forms.Button();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.elementHost2 = new System.Windows.Forms.Integration.ElementHost();
             ((System.ComponentModel.ISupportInitialize)(this._selectedIterationsGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -63,17 +63,6 @@
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = null;
             // 
-            // lbWorkItems
-            // 
-            this.lbWorkItems.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.lbWorkItems.FormattingEnabled = true;
-            this.lbWorkItems.Location = new System.Drawing.Point(6, 193);
-            this.lbWorkItems.Name = "lbWorkItems";
-            this.lbWorkItems.Size = new System.Drawing.Size(319, 355);
-            this.lbWorkItems.TabIndex = 14;
-            this.lbWorkItems.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbWorkItems_MouseDown);
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -94,16 +83,16 @@
             this._selectedIterationsGrid.Size = new System.Drawing.Size(319, 152);
             this._selectedIterationsGrid.TabIndex = 16;
             // 
-            // btnRefreshBoard
+            // btnRefresh
             // 
-            this.btnRefreshBoard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnRefreshBoard.Location = new System.Drawing.Point(3, 545);
-            this.btnRefreshBoard.Name = "btnRefreshBoard";
-            this.btnRefreshBoard.Size = new System.Drawing.Size(322, 23);
-            this.btnRefreshBoard.TabIndex = 17;
-            this.btnRefreshBoard.Text = "Refresh Board";
-            this.btnRefreshBoard.UseVisualStyleBackColor = true;
-            this.btnRefreshBoard.Click += new System.EventHandler(this.btnRefreshBoard_Click);
+            this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnRefresh.Location = new System.Drawing.Point(3, 545);
+            this.btnRefresh.Name = "btnRefresh";
+            this.btnRefresh.Size = new System.Drawing.Size(322, 23);
+            this.btnRefresh.TabIndex = 17;
+            this.btnRefresh.Text = "Refresh";
+            this.btnRefresh.UseVisualStyleBackColor = true;
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
             // splitContainer1
             // 
@@ -113,10 +102,10 @@
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.btnRefreshBoard);
+            this.splitContainer1.Panel1.Controls.Add(this.elementHost2);
+            this.splitContainer1.Panel1.Controls.Add(this.btnRefresh);
             this.splitContainer1.Panel1.Controls.Add(this._selectedIterationsGrid);
             this.splitContainer1.Panel1.Controls.Add(this.label1);
-            this.splitContainer1.Panel1.Controls.Add(this.lbWorkItems);
             this.splitContainer1.Panel1.Controls.Add(this.label2);
             // 
             // splitContainer1.Panel2
@@ -125,6 +114,15 @@
             this.splitContainer1.Size = new System.Drawing.Size(1280, 571);
             this.splitContainer1.SplitterDistance = 327;
             this.splitContainer1.TabIndex = 18;
+            // 
+            // elementHost2
+            // 
+            this.elementHost2.Location = new System.Drawing.Point(6, 193);
+            this.elementHost2.Name = "elementHost2";
+            this.elementHost2.Size = new System.Drawing.Size(318, 355);
+            this.elementHost2.TabIndex = 18;
+            this.elementHost2.Text = "elementHost2";
+            this.elementHost2.Child = null;
             // 
             // Main
             // 
@@ -153,11 +151,11 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Integration.ElementHost elementHost1;
-        private System.Windows.Forms.ListBox lbWorkItems;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.DataGridView _selectedIterationsGrid;
-        private System.Windows.Forms.Button btnRefreshBoard;
+        private System.Windows.Forms.Button btnRefresh;
         private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.Integration.ElementHost elementHost2;
     }
 }
 
