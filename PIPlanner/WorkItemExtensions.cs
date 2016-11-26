@@ -11,7 +11,7 @@ namespace PIPlanner
     {
         public static string ToLabel(this WorkItem wi)
         {
-            return wi.Fields["System.Id"].Value + ":" + wi.Fields["System.Title"].Value;
+            return "[" + wi.Fields["System.State"].Value + "] " + wi.Fields["System.Id"].Value + ":" + wi.Fields["System.Title"].Value;
         }
     }
 }

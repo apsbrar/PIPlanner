@@ -7,6 +7,8 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
+using System.Text;
+using System.Configuration;
 
 namespace PIPlanner
 {
@@ -68,12 +70,14 @@ namespace PIPlanner
             }
         }
 
-        public ICollection<WorkItem> GetWorkItemsUnerIterationPath(string iterationPath)
+        public ICollection<WorkItem> GetWorkItemsUnderIterationPath(string iterationPath)
         {
             ICollection<WorkItem> result = new Collection<WorkItem>();
-            string query = string.Format(CultureInfo.CurrentCulture,
-                                         "SELECT [System.Id], [System.IterationId], [System.IterationPath], [System.Title] FROM WorkItems WHERE [System.IterationPath] UNDER '{0}'",
-                                         iterationPath);      
+            string query = GetWorkItemQuery(iterationPath, true);
+            //string query = string.Format(CultureInfo.CurrentCulture,
+            //                             "SELECT [System.Id], [System.IterationId], [System.IterationPath], [System.State], [System.Title] " +
+            //                             "FROM WorkItems WHERE [Work Item Type] = 'User Story' AND [System.IterationPath] UNDER '{0}'",
+            //                             iterationPath);      
             foreach (WorkItem item in store.Query(query))
             {
                 result.Add(item);
@@ -85,15 +89,47 @@ namespace PIPlanner
         public ICollection<WorkItem> GetWorkItemsInIterationPath(string iterationPath)
         {
             ICollection<WorkItem> result = new Collection<WorkItem>();
-            string query = string.Format(CultureInfo.CurrentCulture,
-                                         "SELECT [System.Id], [System.IterationId], [System.IterationPath], [System.Title] FROM WorkItems WHERE [System.IterationPath] = '{0}'",
-                                         iterationPath);
+            string query = GetWorkItemQuery(iterationPath, false);
+                //string.Format(CultureInfo.CurrentCulture,
+            //                             "SELECT [System.Id], [System.IterationId], [System.IterationPath], [System.State], [System.Title] " +
+            //                             "FROM WorkItems WHERE [Work Item Type] = 'User Story' AND [System.IterationPath] = '{0}'",
+            //                             iterationPath);
             foreach (WorkItem item in store.Query(query))
             {
                 result.Add(item);
+                
             }
+            
 
             return result;
+        }
+
+        string GetWorkItemQuery(string iterationPath, bool under)
+        {
+            string extraFilter = "";
+            if (ConfigurationManager.AppSettings["WorkItemQueryFilter"] != null)
+            {
+                extraFilter = ConfigurationManager.AppSettings["WorkItemQueryFilter"].ToString();
+            }
+
+            string query = string.Format(CultureInfo.CurrentCulture,
+                                         "SELECT [System.Id], [System.IterationId], [System.IterationPath], [System.State], [System.Title] " +
+                                         "FROM WorkItems WHERE [System.IterationPath] " + (under ? "UNDER" : "=") + " '{0}' " + extraFilter,
+                                         iterationPath);
+
+            return query;
+        }
+
+        public WorkItemLinkInfo[] GetDependentItemIds(int id)
+        {
+            StringBuilder queryString = new StringBuilder("SELECT *" +
+                                                          " FROM WorkItemLinks " +
+                                                          " WHERE [System.Links.LinkType] = 'System.LinkTypes.Dependency-Reverse' AND  [Source].[System.Id] = " + id
+                                                          );
+            Query wiQuery = new Query(store, queryString.ToString());
+            WorkItemLinkInfo[] wiTrees = wiQuery.RunLinkQuery();
+
+            return wiTrees;
         }
     }
 }

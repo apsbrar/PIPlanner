@@ -16,6 +16,7 @@ namespace PIPlanner
 {
     internal static class TableHelper
     {
+        public static Tfs _tfs;
         private static Point startPoint;
         internal static void SetTable(List<IterationSelection> selections, Grid table, Tfs tfs)
         {
@@ -87,7 +88,7 @@ namespace PIPlanner
                     lv.PreviewMouseMove += lv_PreviewMouseMove;
                     lv.Tag = teamIteration;
 
-                    var teamIterationWorkItems = tfs.GetWorkItemsUnerIterationPath(teamIteration.Path);
+                    var teamIterationWorkItems = tfs.GetWorkItemsUnderIterationPath(teamIteration.Path);
                     foreach (var teamIterationWorkItem in teamIterationWorkItems)
                     {
                         AddWorkItemToSprint(lv, teamIterationWorkItem);
@@ -182,9 +183,29 @@ namespace PIPlanner
         public static void AddWorkItemToSprint(ListView lv, WorkItem teamIterationWorkItem)
         {
             var lvi = new ListViewItem();
-            lvi.Content = teamIterationWorkItem.ToLabel();
+            lvi.Content = new TextBlock() { Text = teamIterationWorkItem.ToLabel(), HorizontalAlignment= HorizontalAlignment.Stretch };
+            lvi.HorizontalContentAlignment = HorizontalAlignment.Stretch;
             lvi.Tag = teamIterationWorkItem;
 
+            //var dependencies = _tfs.GetDependentItemIds(teamIterationWorkItem.Id);
+            //foreach (var dependency in dependencies)
+            //{
+            //    if (dependency.SourceId == teamIterationWorkItem.Id)
+            //    {
+            //        lvi.Content = lvi.Content.ToString() + System.Environment.NewLine + dependency.TargetId;
+            //        lvi.Background = Brushes.Pink;
+            //    }
+            //}
+
+            SetDependency(teamIterationWorkItem, lvi);
+
+            lvi.MouseDoubleClick += lvi_MouseDoubleClick;
+            lv.Items.Add(lvi);
+        }
+
+        private static void SetDependency(WorkItem teamIterationWorkItem, ListViewItem lvi)
+        {
+            var txtBlock = (TextBlock)lvi.Content;
             foreach (Link link in teamIterationWorkItem.Links)
             {
                 if (link.GetType() == typeof(RelatedLink))
@@ -192,14 +213,11 @@ namespace PIPlanner
                     var rel = link as RelatedLink;
                     if (rel.LinkTypeEnd.Name == "Predecessor")
                     {
-                        lvi.Content = lvi.Content.ToString() + System.Environment.NewLine + rel.RelatedWorkItemId;
-                        lvi.Background = Brushes.Pink;
+                        txtBlock.Text = txtBlock.Text.ToString() + System.Environment.NewLine + rel.RelatedWorkItemId;
+                        txtBlock.Background = Brushes.Pink;
                     }
                 }
             }
-
-            lvi.MouseDoubleClick += lvi_MouseDoubleClick;
-            lv.Items.Add(lvi);
         }
 
         static void lvi_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -221,6 +239,7 @@ namespace PIPlanner
                     int idBefore = witControl.Item.IterationId;
                     container.ShowDialog();
                     witControl.Item.Save();
+                    witControl.Item.SyncToLatest();
                     if (lv.Name == "lvWorkItems") // dontmove item on save of item from Backlog List as it will crash
                         return;
                     int idAfter = witControl.Item.IterationId;
@@ -239,6 +258,11 @@ namespace PIPlanner
                                 break;
                             }
                         }
+                    }
+                    else
+                    {
+                        lvi.Content = new TextBlock() { Text = witControl.Item.ToLabel() };
+                        SetDependency(witControl.Item, lvi);
                     }
                 }
             }

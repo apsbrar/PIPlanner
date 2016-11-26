@@ -58,7 +58,7 @@
             this.elementHost1.Location = new System.Drawing.Point(0, 0);
             this.elementHost1.Margin = new System.Windows.Forms.Padding(0);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(949, 571);
+            this.elementHost1.Size = new System.Drawing.Size(949, 574);
             this.elementHost1.TabIndex = 13;
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = null;
@@ -86,7 +86,7 @@
             // btnRefresh
             // 
             this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnRefresh.Location = new System.Drawing.Point(3, 545);
+            this.btnRefresh.Location = new System.Drawing.Point(3, 548);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(322, 23);
             this.btnRefresh.TabIndex = 17;
@@ -111,15 +111,17 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.elementHost1);
-            this.splitContainer1.Size = new System.Drawing.Size(1280, 571);
+            this.splitContainer1.Size = new System.Drawing.Size(1280, 574);
             this.splitContainer1.SplitterDistance = 327;
             this.splitContainer1.TabIndex = 18;
             // 
             // elementHost2
             // 
+            this.elementHost2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.elementHost2.Location = new System.Drawing.Point(6, 193);
             this.elementHost2.Name = "elementHost2";
-            this.elementHost2.Size = new System.Drawing.Size(318, 355);
+            this.elementHost2.Size = new System.Drawing.Size(318, 349);
             this.elementHost2.TabIndex = 18;
             this.elementHost2.Text = "elementHost2";
             this.elementHost2.Child = null;
@@ -130,7 +132,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1280, 571);
+            this.ClientSize = new System.Drawing.Size(1280, 574);
             this.Controls.Add(this.splitContainer1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Main";

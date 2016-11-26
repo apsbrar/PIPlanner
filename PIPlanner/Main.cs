@@ -18,7 +18,7 @@ namespace PIPlanner
         public Main()
         {
             InitializeComponent();
-
+            
             var scroll = new ScrollViewer();
             scroll.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
             scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
@@ -54,9 +54,12 @@ namespace PIPlanner
                 }
 
                 tfs = new Tfs(new Uri(tfsUriStr));
+                TableHelper._tfs = tfs;
                 var picker = new IterationPicker(tfs);
                 if (picker.ShowDialog(this) == System.Windows.Forms.DialogResult.OK && picker.SelectedIterations != null)
                 {
+                    System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                    sw.Start();
                     this.Cursor = Cursors.WaitCursor;
                     List<IterationSelection> selections = picker.SelectedIterations;
 
@@ -64,6 +67,9 @@ namespace PIPlanner
 
                     TableHelper.SetTable(selections, _table, tfs);
                     this.Cursor = Cursors.Default;
+                    sw.Stop();
+                    var secs = sw.Elapsed.TotalSeconds;
+                    System.Diagnostics.Debug.WriteLine(secs);
                 }
                 else
                 {

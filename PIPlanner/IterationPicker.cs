@@ -83,6 +83,7 @@ namespace PIPlanner
             _grid.DataSource = bindingSource_main;
             _grid.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             _grid.Columns[1].ReadOnly = true;
+            _grid.Columns[2].Visible = false;
 
             btnSelectAll.Visible = _dataTable.Rows.Count > 0;
         }
