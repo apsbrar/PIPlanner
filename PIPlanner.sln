@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PIPlanner", "PIPlanner\PIPlanner.csproj", "{87AD703F-1373-49CB-BE56-415817BA72B2}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "PIPlannerSetup", "PIPlannerSetup\PIPlannerSetup.vdproj", "{2F426BF8-9F57-4640-9578-D550B699E89B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,8 @@ Global
 		{87AD703F-1373-49CB-BE56-415817BA72B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87AD703F-1373-49CB-BE56-415817BA72B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87AD703F-1373-49CB-BE56-415817BA72B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F426BF8-9F57-4640-9578-D550B699E89B}.Debug|Any CPU.ActiveCfg = Debug
+		{2F426BF8-9F57-4640-9578-D550B699E89B}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

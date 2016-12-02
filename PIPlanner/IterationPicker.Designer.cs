@@ -44,10 +44,11 @@
             // 
             // Projects
             // 
+            this.Projects.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.Projects.FormattingEnabled = true;
             this.Projects.Location = new System.Drawing.Point(60, 12);
             this.Projects.Name = "Projects";
-            this.Projects.Size = new System.Drawing.Size(210, 21);
+            this.Projects.Size = new System.Drawing.Size(200, 21);
             this.Projects.TabIndex = 6;
             this.Projects.SelectedIndexChanged += new System.EventHandler(this.Projects_SelectedIndexChanged);
             // 
@@ -117,6 +118,7 @@
             // 
             // btnLoadPreviousFilter
             // 
+            this.btnLoadPreviousFilter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnLoadPreviousFilter.Location = new System.Drawing.Point(12, 305);
             this.btnLoadPreviousFilter.Name = "btnLoadPreviousFilter";
             this.btnLoadPreviousFilter.Size = new System.Drawing.Size(136, 23);
@@ -139,11 +141,11 @@
             this.Controls.Add(this.btnSelectAll);
             this.Controls.Add(this.Projects);
             this.Controls.Add(this.LabelProjects);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "IterationPicker";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Iteration Picker";
             this.Load += new System.EventHandler(this.IterationPicker_Load);

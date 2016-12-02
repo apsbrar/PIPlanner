@@ -11,19 +11,22 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using System.Windows.Input;
+using System.Windows.Controls.Primitives;
 
 namespace PIPlanner
 {
     internal static class TableHelper
     {
         public static Tfs _tfs;
+        public static Grid _table;
         private static Point startPoint;
+
         internal static void SetTable(List<IterationSelection> selections, Grid table, Tfs tfs)
         {
             ClearTable(table);
-
+            System.Windows.Forms.Application.DoEvents();
             AddTeams(selections, table);
-
+            System.Windows.Forms.Application.DoEvents();
             AddIterations(selections, table, tfs);
         }
 
@@ -51,6 +54,7 @@ namespace PIPlanner
                     {
                         iterationsDict[subIterationText].Add(subIteration);
                     }
+                    System.Windows.Forms.Application.DoEvents();
                 }
             }
 
@@ -73,10 +77,21 @@ namespace PIPlanner
                 Grid.SetColumn(lbl, column);
                 table.Children.Add(lbl);
 
-                int row = 1;
+                int row = 0;
                 foreach (var teamIteration in iterationsDict[iteration])
                 {
                     var sp = new StackPanel();
+
+                    var selection = selections.FirstOrDefault(it => it.SubIterations.FirstOrDefault(sit => sit.Id == teamIteration.Id) != null);
+
+                    for (int i = 0; i <= _table.RowDefinitions.Count; i++)
+			        {
+                        if (table.RowDefinitions[i].Tag == selection.Iteration)
+                        {
+                            row = i;
+                            break;
+                        }
+			        }
 
                     var header = new TextBlock() { Tag = teamIteration, Text = teamIteration.Path, Background = Brushes.Black, Foreground = Brushes.White };
                     header.PreviewDragEnter += header_DragEnter;
@@ -89,10 +104,13 @@ namespace PIPlanner
                     lv.Tag = teamIteration;
 
                     var teamIterationWorkItems = tfs.GetWorkItemsUnderIterationPath(teamIteration.Path);
+                    List<ListViewItem> wis = new List<ListViewItem>();
                     foreach (var teamIterationWorkItem in teamIterationWorkItems)
                     {
-                        AddWorkItemToSprint(lv, teamIterationWorkItem);
+                        var lvi = GetLviForWi(teamIterationWorkItem);
+                        wis.Add(lvi);
                     }
+                    lv.ItemsSource = wis;
 
                     sp.Children.Add(header);
                     sp.Children.Add(lv);
@@ -101,7 +119,7 @@ namespace PIPlanner
                     Grid.SetColumn(sp, column);
                     table.Children.Add(sp);
 
-                    row++;
+                    System.Windows.Forms.Application.DoEvents();
                 }
 
                 column++;
@@ -182,30 +200,29 @@ namespace PIPlanner
 
         public static void AddWorkItemToSprint(ListView lv, WorkItem teamIterationWorkItem)
         {
+            var lvi = GetLviForWi(teamIterationWorkItem);
+            var list = lv.ItemsSource as List<ListViewItem>;
+            list.Add(lvi);
+            lv.Items.Refresh();
+        }
+
+        public static ListViewItem GetLviForWi(WorkItem teamIterationWorkItem)
+        {
             var lvi = new ListViewItem();
-            lvi.Content = new TextBlock() { Text = teamIterationWorkItem.ToLabel(), HorizontalAlignment= HorizontalAlignment.Stretch };
+            lvi.Content = new TextBlock() { Text = teamIterationWorkItem.ToLabel(), HorizontalAlignment = HorizontalAlignment.Stretch };
             lvi.HorizontalContentAlignment = HorizontalAlignment.Stretch;
             lvi.Tag = teamIterationWorkItem;
-
-            //var dependencies = _tfs.GetDependentItemIds(teamIterationWorkItem.Id);
-            //foreach (var dependency in dependencies)
-            //{
-            //    if (dependency.SourceId == teamIterationWorkItem.Id)
-            //    {
-            //        lvi.Content = lvi.Content.ToString() + System.Environment.NewLine + dependency.TargetId;
-            //        lvi.Background = Brushes.Pink;
-            //    }
-            //}
 
             SetDependency(teamIterationWorkItem, lvi);
 
             lvi.MouseDoubleClick += lvi_MouseDoubleClick;
-            lv.Items.Add(lvi);
+            return lvi;
         }
 
         private static void SetDependency(WorkItem teamIterationWorkItem, ListViewItem lvi)
         {
             var txtBlock = (TextBlock)lvi.Content;
+            string ids = "";
             foreach (Link link in teamIterationWorkItem.Links)
             {
                 if (link.GetType() == typeof(RelatedLink))
@@ -215,10 +232,110 @@ namespace PIPlanner
                     {
                         txtBlock.Text = txtBlock.Text.ToString() + System.Environment.NewLine + rel.RelatedWorkItemId;
                         txtBlock.Background = Brushes.Pink;
+                        ids += rel.RelatedWorkItemId + " ";
                     }
+                }
+                System.Windows.Forms.Application.DoEvents();
+            }
+
+            if(ids != "")
+            {
+                txtBlock.Tag = ids;
+                var cmenu = new ContextMenu();
+                txtBlock.ContextMenuOpening += txtBlock_ContextMenuOpening;
+                txtBlock.ContextMenu = cmenu;
+            }
+        }
+
+        static void txtBlock_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine(sender.ToString());
+            var txtBlock = e.Source as TextBlock;
+
+            string ids = txtBlock.Tag as string;
+            if(!string.IsNullOrWhiteSpace(ids))
+            {
+                var idList = ids.Split(' ');
+                var newMenu = new ContextMenu();
+
+                foreach(string id in idList)
+                {
+                    if (id.Trim() == "")
+                        continue;
+
+                    var mi = new MenuItem();
+                    mi.Header = id;
+                    
+                    var miOpen = new MenuItem();
+                    miOpen.Header = "Open";
+                    miOpen.Click += miOpen_Click;
+                    miOpen.Tag = Convert.ToInt32(id.Trim());
+                    mi.Items.Add(miOpen);
+
+
+                    var miFind = new MenuItem();
+                    miFind.Header = "Find";
+                    miFind.Click += miFind_Click;
+                    miFind.Tag = Convert.ToInt32(id.Trim());
+                    mi.Items.Add(miFind);
+
+                    newMenu.Items.Add(mi);
+                }
+
+                txtBlock.ContextMenu = newMenu;
+            }
+        }
+
+        static void miFind_Click(object sender, RoutedEventArgs e)
+        {
+            var src = e.Source as FrameworkElement;
+            if (src != null)
+            {
+                int id = (int)src.Tag;
+                if (id > 0)
+                {
+                     var listViews = FindChildren<ListView>(_table);
+
+                    foreach (var listView in listViews)
+                    {
+                        foreach (ListViewItem lvi in listView.Items)
+	                    {
+		                    var wi = lvi.Tag as WorkItem;
+                            if(wi != null && wi.Id == id)
+                            {
+
+                                Point pointTransformToVisual = lvi.TransformToVisual(_table).Transform(new Point());
+                                Rect boundsRect = VisualTreeHelper.GetDescendantBounds(lvi);
+                                boundsRect.Offset(pointTransformToVisual.X, pointTransformToVisual.Y);
+                                _table.BringIntoView(boundsRect);
+                                listView.SelectedItem = lvi;
+                                lvi.IsSelected = true;
+                                lvi.Focus();
+                                return;
+                            }
+	                    }
+                    }
+
+                    MessageBox.Show(id + " Not found on the board");
                 }
             }
         }
+
+        static void miOpen_Click(object sender, RoutedEventArgs e)
+        {
+            var src = e.Source as FrameworkElement;
+            if (src != null)
+            {
+                int id = (int)src.Tag;
+                if (id > 0)
+                {
+                    var wi = _tfs.GetWorkItem(id.ToString());
+                    if (wi != null)
+                        ShowWorkItem(wi, id + " (Readonly)");
+                }
+            }
+        }
+
 
         static void lvi_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -229,23 +346,22 @@ namespace PIPlanner
                 if (lvi != null)
                 {
                     ListView lv = FindAnchestor<ListView>(lvi);
+                    var wi = lvi.Tag as WorkItem;
 
+                    
+                    int iterationIdBefore = wi.IterationId;
+                    ShowWorkItem(wi);
+                    wi.Save();
+                    wi.SyncToLatest();
 
-                    var witControl = new WorkItemControl();
-                    witControl.Item = lvi.Tag as WorkItem;
-
-                    var container = new Window();
-                    container.Content = witControl;
-                    int idBefore = witControl.Item.IterationId;
-                    container.ShowDialog();
-                    witControl.Item.Save();
-                    witControl.Item.SyncToLatest();
                     if (lv.Name == "lvWorkItems") // dontmove item on save of item from Backlog List as it will crash
                         return;
-                    int idAfter = witControl.Item.IterationId;
-                    if (idBefore != idAfter)
+                    int idAfter = wi.IterationId;
+                    if (iterationIdBefore != iterationIdAfter)
                     {
-                        lv.Items.Remove(lvi);
+                        var list = lv.ItemsSource as List<ListViewItem>;
+                        list.Remove(lvi);
+                        lv.Items.Refresh();
                         Grid grd = FindAnchestor<Grid>(lv);
                         var listViews = FindChildren<ListView>(grd);
 
@@ -254,15 +370,15 @@ namespace PIPlanner
                             var iter = listView.Tag as Iteration;
                             if (iter != null && iter.Id == idAfter)
                             {
-                                AddWorkItemToSprint(listView, witControl.Item);
+                                AddWorkItemToSprint(listView, wi);
                                 break;
                             }
                         }
                     }
                     else
                     {
-                        lvi.Content = new TextBlock() { Text = witControl.Item.ToLabel() };
-                        SetDependency(witControl.Item, lvi);
+                        lvi.Content = new TextBlock() { Text = wi.ToLabel() };
+                        SetDependency(wi, lvi);
                     }
                 }
             }
@@ -270,6 +386,21 @@ namespace PIPlanner
             {
                 System.Windows.Forms.Application.OpenForms[0].Cursor = System.Windows.Forms.Cursors.Default;
             }
+        }
+
+        private static void ShowWorkItem(WorkItem wi, string caption = "")
+        {
+            WorkItemControl witControl = new WorkItemControl();
+            witControl.Item = wi;
+
+            var container = new Window();
+            if (caption == "")
+                container.Title = wi.Id.ToString();
+            else
+                container.Title = caption;
+
+            container.Content = witControl;
+            container.ShowDialog();
         }
 
         static void header_DragEnter(object sender, DragEventArgs e)
@@ -316,7 +447,9 @@ namespace PIPlanner
                                         var tempWi = ((ListViewItem)item).Tag as WorkItem;
                                         if (tempWi != null && wi == tempWi)
                                         {
-                                            originLV.Items.Remove(item);
+                                            var list = originLV.ItemsSource as List<ListViewItem>;
+                                            list.Remove((ListViewItem)item);
+                                            originLV.Items.Refresh();
                                             break;
                                         }
                                     }
@@ -339,7 +472,9 @@ namespace PIPlanner
             int row = 1;
             foreach (var selection in selections)
             {
-                table.RowDefinitions.Add(new RowDefinition());
+                var rd = new RowDefinition();
+                rd.Tag = selection.Iteration;
+                table.RowDefinitions.Add(rd);
                 string text = GetTeamName(selection.Iteration.Path);
                 var lbl = new TextBlock()
                 {
@@ -354,6 +489,7 @@ namespace PIPlanner
                 Grid.SetColumn(lbl, 0);
                 table.Children.Add(lbl);
                 row++;
+                System.Windows.Forms.Application.DoEvents();
             }
         }
 
@@ -391,5 +527,7 @@ namespace PIPlanner
 
             return retVal;
         }
+
+        public static int iterationIdAfter { get; set; }
     }
 }

@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("PIPlanner")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("PI Planning Board")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("None")]
 [assembly: AssemblyProduct("PIPlanner")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]

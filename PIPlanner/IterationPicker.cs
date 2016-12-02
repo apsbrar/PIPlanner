@@ -62,6 +62,16 @@ namespace PIPlanner
             {
                 Projects.SelectedIndex = _edsIndex;
             }
+
+            if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.LastProject) &&
+                       !string.IsNullOrWhiteSpace(Properties.Settings.Default.LastFilter))
+            {
+                btnLoadPreviousFilter.Enabled = true;
+            }
+            else
+            {
+                btnLoadPreviousFilter.Enabled = false;
+            }
         }
 
         private void Projects_SelectedIndexChanged(object sender, EventArgs e)
@@ -152,20 +162,15 @@ namespace PIPlanner
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.LastProject) &&
-                       !string.IsNullOrWhiteSpace(Properties.Settings.Default.LastFilter))
-                {
-                    int index = Projects.FindStringExact(Properties.Settings.Default.LastProject);
-                    Projects.SelectedIndex = index;
-                    _grid.LoadFilterAndSort(Properties.Settings.Default.LastFilter, "");
-                    _grid.EnableFilterAndSort(_grid.Columns[0]);
-                    _grid.EnableFilterAndSort(_grid.Columns[1]);
-                    btnSelectAll_Click(null, null);
-                }
+                int index = Projects.FindStringExact(Properties.Settings.Default.LastProject);
+                Projects.SelectedIndex = index;
+                _grid.LoadFilterAndSort(Properties.Settings.Default.LastFilter, "");
+                _grid.EnableFilterAndSort(_grid.Columns[0]);
+                _grid.EnableFilterAndSort(_grid.Columns[1]);
+                btnSelectAll_Click(null, null);
             }
             catch (Exception ex)
             {
-
                 MessageBox.Show(ex.Message);
             }
         }

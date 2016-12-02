@@ -104,6 +104,20 @@ namespace PIPlanner
             return result;
         }
 
+        public WorkItem GetWorkItem(string id)
+        {
+            string query = string.Format(CultureInfo.CurrentCulture,
+                                         "SELECT [System.Id], [System.IterationId], [System.IterationPath], [System.State], [System.Title] " +
+                                         "FROM WorkItems WHERE [System.Id] = {0}",
+                                         id);
+            foreach (WorkItem item in store.Query(query))
+            {
+                return item;
+            }
+
+            return null;
+        }
+
         string GetWorkItemQuery(string iterationPath, bool under)
         {
             string extraFilter = "";
