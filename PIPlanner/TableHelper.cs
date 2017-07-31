@@ -27,7 +27,10 @@ namespace PIPlanner
             System.Windows.Forms.Application.DoEvents();
             AddTeams(selections, table);
             System.Windows.Forms.Application.DoEvents();
-            AddIterations(selections, table, tfs);
+            
+	    List<IterationSelection> engSelections = selections.Where(sel => !sel.Platform).ToList();
+            List<IterationSelection> pltfrmSelections = selections.Where(sel => sel.Platform).ToList();
+            AddIterations(engSelections, pltfrmSelections, table, tfs);
         }
 
         private static void ClearTable(Grid table)
@@ -37,13 +40,14 @@ namespace PIPlanner
             table.Children.Clear();
         }
 
-        private static void AddIterations(List<IterationSelection> selections, Grid table, Tfs tfs)
+        private static void AddIterations(List<IterationSelection> selections, List<IterationSelection> pltfrmSelections, Grid table, Tfs tfs)
         {
             //Find all iterations for all the teams in selections
             var iterationsDict = new Dictionary<string, List<Iteration>>();
             foreach (var selection in selections)
             {
-                foreach (var subIteration in selection.SubIterations)
+                if (selection.Platform) continue;
+		foreach (var subIteration in selection.SubIterations)
                 {
                     string subIterationText = GetIterationText(subIteration.Path);
                     if (!iterationsDict.Keys.Contains(subIterationText))
@@ -110,6 +114,52 @@ namespace PIPlanner
                         var lvi = GetLviForWi(teamIterationWorkItem);
                         wis.Add(lvi);
                     }
+                    lv.ItemsSource = wis;
+
+                    sp.Children.Add(header);
+                    sp.Children.Add(lv);
+
+                    Grid.SetRow(sp, row);
+                    Grid.SetColumn(sp, column);
+                    table.Children.Add(sp);
+
+                    System.Windows.Forms.Application.DoEvents();
+                }
+		    
+		foreach (var pltfrmSel in pltfrmSelections)
+                {
+                    var sp = new StackPanel();
+
+                    // Find the row corresponding to the current team.
+                    for (int i = 0; i <= _table.RowDefinitions.Count; i++)
+                    {
+                        if (table.RowDefinitions[i].Tag == pltfrmSel.Iteration)
+                        {
+                            row = i;
+                            break;
+                        }
+                    }
+
+                    var teamIterationWorkItems = tfs.GetWorkItemsWithTag("ENG-" + iteration, pltfrmSel.Path);
+
+
+                    var header = new TextBlock() { Tag = iteration, Text = pltfrmSel.Path, Background = Brushes.Black, Foreground = Brushes.White };
+                    header.PreviewDragEnter += header_DragEnter;
+                    header.PreviewDrop += header_Drop;
+                    header.AllowDrop = true;
+                    header.Padding = new Thickness(2);
+                    var lv = new ListView();
+                    lv.PreviewMouseLeftButtonDown += lv_PreviewMouseLeftButtonDown;
+                    lv.PreviewMouseMove += lv_PreviewMouseMove;
+                    lv.Tag = "ENG-" + iteration;
+
+                    List<ListViewItem> wis = new List<ListViewItem>();
+                    foreach (var teamIterationWorkItem in teamIterationWorkItems)
+                    {
+                        var lvi = GetLviForWi(teamIterationWorkItem);
+                        wis.Add(lvi);
+                    }
+
                     lv.ItemsSource = wis;
 
                     sp.Children.Add(header);
