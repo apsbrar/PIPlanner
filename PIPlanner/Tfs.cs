@@ -103,6 +103,23 @@ namespace PIPlanner
 
             return result;
         }
+        
+        public ICollection<WorkItem> GetWorkItemsWithTag(string tag, string iterationPath)
+        {
+            ICollection<WorkItem> result = new Collection<WorkItem>();
+
+            string query = string.Format(CultureInfo.CurrentCulture,
+                "SELECT [System.Id], [System.IterationId], [System.IterationPath], [System.State], [System.Title] " +
+                "FROM WorkItems WHERE [System.IterationPath] " + "UNDER" + " '{0}' " + "AND [System.Tags] CONTAINS " + "'{1}'",
+                iterationPath, tag);
+
+            foreach (WorkItem item in store.Query(query))
+            {
+                result.Add(item);
+            }
+
+            return result;
+        }
 
         public WorkItem GetWorkItem(string id)
         {
