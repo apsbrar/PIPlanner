@@ -26,6 +26,7 @@ namespace PIPlanner
             _dataSet = new DataSet();
             _dataTable = _dataSet.Tables.Add("IterationSelection");
             _dataTable.Columns.Add(new DataColumn("IsSelected", typeof(bool)));
+            _dataTable.Columns.Add(new DataColumn("Platform", typeof(bool)));
             _dataTable.Columns.Add(new DataColumn("Iteration", typeof(string)));
             _dataTable.Columns.Add(new DataColumn("Id", typeof(int)));
             _dataTable.Columns[0].DefaultValue = false;
@@ -85,15 +86,15 @@ namespace PIPlanner
             _dataTable.Rows.Clear();
             foreach (var iteration in _tfs.GetIterationPaths(item))
             {
-                _dataTable.Rows.Add(false, iteration.Path, iteration.Id);
+                _dataTable.Rows.Add(false, false, iteration.Path, iteration.Id);
             }
 
             bindingSource_main.DataSource = _dataSet;
             bindingSource_main.DataMember = _dataTable.TableName;
             _grid.DataSource = bindingSource_main;
-            _grid.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            _grid.Columns[1].ReadOnly = true;
-            _grid.Columns[2].Visible = false;
+            _grid.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            _grid.Columns[2].ReadOnly = true;
+            _grid.Columns[3].Visible = false;
 
             btnSelectAll.Visible = _dataTable.Rows.Count > 0;
         }
@@ -111,6 +112,7 @@ namespace PIPlanner
                                             .Select(r => new IterationSelection()
                                             {
                                                 IsSelected = r.Field<bool>("IsSelected"),
+                                                Platform = r.Field<bool>("Platform"),
                                                 Iteration = new Iteration(r.Field<int>("Id"), r.Field<string>("Iteration"))
 
                                             }).ToList();
