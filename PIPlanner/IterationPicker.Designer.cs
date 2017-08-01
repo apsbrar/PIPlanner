@@ -38,6 +38,7 @@
             this._grid = new Zuby.ADGV.AdvancedDataGridView();
             this.bindingSource_main = new System.Windows.Forms.BindingSource(this.components);
             this.btnLoadPreviousFilter = new System.Windows.Forms.Button();
+            this.btnLoadSelection = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this._grid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource_main)).BeginInit();
             this.SuspendLayout();
@@ -127,6 +128,17 @@
             this.btnLoadPreviousFilter.UseVisualStyleBackColor = true;
             this.btnLoadPreviousFilter.Click += new System.EventHandler(this.btnLoadPreviousFilter_Click);
             // 
+            // btnLoadSelection
+            // 
+            this.btnLoadSelection.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnLoadSelection.Location = new System.Drawing.Point(155, 306);
+            this.btnLoadSelection.Name = "btnLoadSelection";
+            this.btnLoadSelection.Size = new System.Drawing.Size(149, 23);
+            this.btnLoadSelection.TabIndex = 13;
+            this.btnLoadSelection.Text = "Load Previous Selection";
+            this.btnLoadSelection.UseVisualStyleBackColor = true;
+            this.btnLoadSelection.Click += new System.EventHandler(this.btnLoadSelection_Click);
+            // 
             // IterationPicker
             // 
             this.AcceptButton = this.btnOk;
@@ -134,6 +146,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(536, 340);
+            this.Controls.Add(this.btnLoadSelection);
             this.Controls.Add(this.btnLoadPreviousFilter);
             this.Controls.Add(this._grid);
             this.Controls.Add(this.btnCancel);
@@ -166,5 +179,6 @@
         private Zuby.ADGV.AdvancedDataGridView _grid;
         private System.Windows.Forms.BindingSource bindingSource_main;
         private System.Windows.Forms.Button btnLoadPreviousFilter;
+        private System.Windows.Forms.Button btnLoadSelection;
     }
 }
