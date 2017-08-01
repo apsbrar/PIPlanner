@@ -46,5 +46,20 @@ namespace PIPlanner.Properties {
                 this["LastFilter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastSelection
+        {
+            get
+            {
+                return ((string)(this["LastSelection"]));
+            }
+            set
+            {
+                this["LastSelection"] = value;
+            }
+        }
     }
 }
