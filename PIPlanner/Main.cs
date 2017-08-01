@@ -5,25 +5,38 @@ using System.Configuration;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Forms;
+using System.Windows.Media;
 
 namespace PIPlanner
 {
     public partial class Main : Form
     {
         private Tfs tfs;
+        ScaleTransform _st = new ScaleTransform(1, 1);
         Grid _table = new Grid();
         System.Windows.Controls.ListView lvWorkItems = new System.Windows.Controls.ListView();
 
         public Main()
         {
             InitializeComponent();
-            
-            var scroll = new ScrollViewer();
-            scroll.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
-            scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            var dockpanel = new DockPanel() { HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch, LastChildFill = true};
+            var scroll = new ScrollViewer() {HorizontalScrollBarVisibility = ScrollBarVisibility.Auto, VerticalScrollBarVisibility = ScrollBarVisibility.Auto};
+            var stackPanel = new StackPanel();
+            var slider = CreateZoomSlider();
+
+            stackPanel.Children.Add(slider);
+  
+            dockpanel.Children.Add(stackPanel);
+            dockpanel.Children.Add(scroll);
+            DockPanel.SetDock(scroll, System.Windows.Controls.Dock.Top);
+            DockPanel.SetDock(stackPanel, System.Windows.Controls.Dock.Bottom);
+
             scroll.Content = _table;
-            elementHost1.Child = scroll;
+            elementHost1.Child = dockpanel;
+
+            _table.LayoutTransform = _st;
             _table.Background = System.Windows.Media.Brushes.White;
             _table.ShowGridLines = true;
 
@@ -33,6 +46,56 @@ namespace PIPlanner
             lvWorkItems.Name = "lvWorkItems";
             lvWorkItems.PreviewMouseLeftButtonDown += TableHelper.lv_PreviewMouseLeftButtonDown;
             lvWorkItems.PreviewMouseMove += TableHelper.lv_PreviewMouseMove;
+        }
+
+        private Slider CreateZoomSlider()
+        {
+            var slider = new Slider()
+            {
+                Minimum = 1,
+                Maximum = 4,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
+                IsMoveToPointEnabled = true,
+                AutoToolTipPrecision = 2,
+                AutoToolTipPlacement = AutoToolTipPlacement.BottomRight,
+                TickPlacement = TickPlacement.BottomRight,
+                IsSnapToTickEnabled = true,
+                TickFrequency = .2
+            };
+
+            // Manually add ticks to the slider.
+            DoubleCollection tickMarks = new DoubleCollection();
+            tickMarks.Add(1.1);
+            tickMarks.Add(1.2);
+            tickMarks.Add(1.3);
+            tickMarks.Add(1.4);
+            tickMarks.Add(1.5);
+            tickMarks.Add(1.6);
+            tickMarks.Add(1.7);
+            tickMarks.Add(1.8);
+            tickMarks.Add(1.9);
+            tickMarks.Add(2);
+            tickMarks.Add(2.1);
+            tickMarks.Add(2.2);
+            tickMarks.Add(2.3);
+            tickMarks.Add(2.4);
+            tickMarks.Add(2.5);
+            tickMarks.Add(2.6);
+            tickMarks.Add(2.7);
+            tickMarks.Add(2.8);
+            tickMarks.Add(2.9);
+            tickMarks.Add(3);
+            tickMarks.Add(4);
+            slider.Ticks = tickMarks;
+
+            slider.ValueChanged += slider_ValueChanged;
+            return slider;
+        }
+
+        void slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            _st.ScaleX = e.NewValue;
+            _st.ScaleY = e.NewValue;
         }
 
 
@@ -48,6 +111,14 @@ namespace PIPlanner
                     System.Windows.Forms.MessageBox.Show("TFS Uri not set in config file");
                     System.Windows.Forms.Application.Exit();
                 }
+
+                int autoRefreshInterval = 300000;
+                if (ConfigurationManager.AppSettings["AutoRefreshInterval"] != null)
+                {
+                    int.TryParse(ConfigurationManager.AppSettings["AutoRefreshInterval"], out autoRefreshInterval);
+                }
+
+                timer1.Interval = autoRefreshInterval;
 
                 string tfsUriStr = ConfigurationManager.AppSettings["TFSUri"].ToString();
                 if (!Uri.IsWellFormedUriString(tfsUriStr, UriKind.Absolute))
@@ -159,6 +230,16 @@ namespace PIPlanner
                 splitContainer1.Enabled = true;
                 this.Cursor = Cursors.Default;
             }
+        }
+
+        private void chkAutoRefresh_CheckedChanged(object sender, EventArgs e)
+        {
+            timer1.Enabled = chkAutoRefresh.Checked;
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            btnRefresh_Click(null, null);
         }
 
 

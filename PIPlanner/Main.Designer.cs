@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.label1 = new System.Windows.Forms.Label();
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
@@ -35,7 +36,9 @@
             this._selectedIterationsGrid = new System.Windows.Forms.DataGridView();
             this.btnRefresh = new System.Windows.Forms.Button();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.chkAutoRefresh = new System.Windows.Forms.CheckBox();
             this.elementHost2 = new System.Windows.Forms.Integration.ElementHost();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this._selectedIterationsGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -88,7 +91,7 @@
             this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnRefresh.Location = new System.Drawing.Point(3, 548);
             this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(322, 23);
+            this.btnRefresh.Size = new System.Drawing.Size(227, 23);
             this.btnRefresh.TabIndex = 17;
             this.btnRefresh.Text = "Refresh";
             this.btnRefresh.UseVisualStyleBackColor = true;
@@ -103,11 +106,13 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.chkAutoRefresh);
             this.splitContainer1.Panel1.Controls.Add(this.elementHost2);
             this.splitContainer1.Panel1.Controls.Add(this.btnRefresh);
             this.splitContainer1.Panel1.Controls.Add(this._selectedIterationsGrid);
             this.splitContainer1.Panel1.Controls.Add(this.label1);
             this.splitContainer1.Panel1.Controls.Add(this.label2);
+            this.splitContainer1.Panel1MinSize = 5;
             // 
             // splitContainer1.Panel2
             // 
@@ -115,6 +120,18 @@
             this.splitContainer1.Size = new System.Drawing.Size(1280, 574);
             this.splitContainer1.SplitterDistance = 327;
             this.splitContainer1.TabIndex = 18;
+            // 
+            // chkAutoRefresh
+            // 
+            this.chkAutoRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.chkAutoRefresh.AutoSize = true;
+            this.chkAutoRefresh.Location = new System.Drawing.Point(236, 552);
+            this.chkAutoRefresh.Name = "chkAutoRefresh";
+            this.chkAutoRefresh.Size = new System.Drawing.Size(88, 17);
+            this.chkAutoRefresh.TabIndex = 19;
+            this.chkAutoRefresh.Text = "Auto Refresh";
+            this.chkAutoRefresh.UseVisualStyleBackColor = true;
+            this.chkAutoRefresh.CheckedChanged += new System.EventHandler(this.chkAutoRefresh_CheckedChanged);
             // 
             // elementHost2
             // 
@@ -126,6 +143,10 @@
             this.elementHost2.TabIndex = 18;
             this.elementHost2.Text = "elementHost2";
             this.elementHost2.Child = null;
+            // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // Main
             // 
@@ -159,6 +180,8 @@
         private System.Windows.Forms.Button btnRefresh;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Integration.ElementHost elementHost2;
+        private System.Windows.Forms.CheckBox chkAutoRefresh;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 
