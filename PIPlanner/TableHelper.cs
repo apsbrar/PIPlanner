@@ -187,15 +187,16 @@ namespace PIPlanner
         private static void SetAllDependencies()
         {
             string allIds = _sb.ToString();
-            
+
             if (allIds.Length > 0)
             {
                 allIds = allIds.Remove(allIds.Length - 1);
                 var wis = _tfs.GetDependentItems(allIds);
-                string ids = "";
+
 
                 foreach (var lvi in _listViewItems)
                 {
+                    string ids = "";
                     WorkItem teamIterationWorkItem = lvi.Tag as WorkItem;
                     var txtBlock = (TextBlock)lvi.Content;
                     var links = wis.Where(wi => wi.SourceId == teamIterationWorkItem.Id);
@@ -204,6 +205,14 @@ namespace PIPlanner
                     {
                         CreateDependencyText(txtBlock, ref ids, link, teamIterationWorkItem);
                         System.Windows.Forms.Application.DoEvents();
+                    }
+
+                    if (ids != "")
+                    {
+                        txtBlock.Tag = ids;
+                        var cmenu = new ContextMenu();
+                        txtBlock.ContextMenuOpening += txtBlock_ContextMenuOpening;
+                        txtBlock.ContextMenu = cmenu;
                     }
                 }
             }
@@ -249,6 +258,11 @@ namespace PIPlanner
         private static T FindAnchestor<T>(DependencyObject current)
     where T : DependencyObject
         {
+            if (current.GetType() == typeof(System.Windows.Documents.Run))
+            {
+                current = ((System.Windows.Documents.Run)current).Parent;
+            }
+
             do
             {
                 if (current is T)
@@ -292,7 +306,7 @@ namespace PIPlanner
         public static ListViewItem GetLviForWi(WorkItem teamIterationWorkItem, bool dependencyCollectMode = false)
         {
             var lvi = new ListViewItem();
-            lvi.Content = new TextBlock() { Text = teamIterationWorkItem.ToLabel(), HorizontalAlignment = HorizontalAlignment.Stretch, IsHitTestVisible = false };
+            lvi.Content = new TextBlock() { Text = teamIterationWorkItem.ToLabel(), HorizontalAlignment = HorizontalAlignment.Stretch };
             lvi.HorizontalContentAlignment = HorizontalAlignment.Stretch;
             lvi.Tag = teamIterationWorkItem;
 
@@ -310,11 +324,9 @@ namespace PIPlanner
 
         private static WorkItem GetWiFromBoard(int id)
         {
-            var listViews = FindChildren<ListView>(_table);
-
-            foreach (var listView in listViews)
+            if (_listViewItems != null)
             {
-                foreach (ListViewItem lvi in listView.Items)
+                foreach (ListViewItem lvi in _listViewItems)
                 {
                     var wi = lvi.Tag as WorkItem;
                     if (wi != null && wi.Id == id)
@@ -392,7 +404,7 @@ namespace PIPlanner
         static void txtBlock_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine(sender.ToString());
-            var txtBlock = e.Source as TextBlock;
+            var txtBlock = sender as TextBlock;
 
             string ids = txtBlock.Tag as string;
             if (!string.IsNullOrWhiteSpace(ids))

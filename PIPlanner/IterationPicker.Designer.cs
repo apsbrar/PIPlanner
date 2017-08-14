@@ -142,7 +142,7 @@
             // 
             // chkLoadSuccesors
             // 
-            this.chkLoadSuccesors.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.chkLoadSuccesors.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.chkLoadSuccesors.AutoSize = true;
             this.chkLoadSuccesors.Location = new System.Drawing.Point(368, 308);
             this.chkLoadSuccesors.Name = "chkLoadSuccesors";
