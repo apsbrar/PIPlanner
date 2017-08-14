@@ -38,6 +38,7 @@
             this._grid = new Zuby.ADGV.AdvancedDataGridView();
             this.bindingSource_main = new System.Windows.Forms.BindingSource(this.components);
             this.btnLoadPreviousFilter = new System.Windows.Forms.Button();
+            this.chkLoadSuccesors = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this._grid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource_main)).BeginInit();
             this.SuspendLayout();
@@ -127,6 +128,17 @@
             this.btnLoadPreviousFilter.UseVisualStyleBackColor = true;
             this.btnLoadPreviousFilter.Click += new System.EventHandler(this.btnLoadPreviousFilter_Click);
             // 
+            // chkLoadSuccesors
+            // 
+            this.chkLoadSuccesors.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.chkLoadSuccesors.AutoSize = true;
+            this.chkLoadSuccesors.Location = new System.Drawing.Point(157, 309);
+            this.chkLoadSuccesors.Name = "chkLoadSuccesors";
+            this.chkLoadSuccesors.Size = new System.Drawing.Size(106, 17);
+            this.chkLoadSuccesors.TabIndex = 13;
+            this.chkLoadSuccesors.Text = "Show Succesors";
+            this.chkLoadSuccesors.UseVisualStyleBackColor = true;
+            // 
             // IterationPicker
             // 
             this.AcceptButton = this.btnOk;
@@ -134,6 +146,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(536, 340);
+            this.Controls.Add(this.chkLoadSuccesors);
             this.Controls.Add(this.btnLoadPreviousFilter);
             this.Controls.Add(this._grid);
             this.Controls.Add(this.btnCancel);
@@ -166,5 +179,6 @@
         private Zuby.ADGV.AdvancedDataGridView _grid;
         private System.Windows.Forms.BindingSource bindingSource_main;
         private System.Windows.Forms.Button btnLoadPreviousFilter;
+        private System.Windows.Forms.CheckBox chkLoadSuccesors;
     }
 }

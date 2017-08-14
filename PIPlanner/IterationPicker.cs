@@ -18,6 +18,14 @@ namespace PIPlanner
         private DataSet _dataSet = null;
         int _edsIndex = 0;
 
+        public bool LoadSuccesors 
+        {
+            get 
+            {
+                return chkLoadSuccesors.Checked;
+            } 
+        }
+
         public IterationPicker(Tfs tfs)
         {
             InitializeComponent();

@@ -151,14 +151,32 @@ namespace PIPlanner
             return query;
         }
 
-        public WorkItemLinkInfo[] GetDependentItemIds(int id)
+        public WorkItemLinkInfo[] GetDependentItems(int id)
         {
-            StringBuilder queryString = new StringBuilder("SELECT *" +
-                                                          " FROM WorkItemLinks " +
-                                                          " WHERE [System.Links.LinkType] = 'System.LinkTypes.Dependency-Reverse' AND  [Source].[System.Id] = " + id
+            StringBuilder queryString = new StringBuilder("SELECT [System.Id], [System.Links.LinkType], [System.WorkItemType], [System.IterationPath] " + 
+                                                            "FROM WorkItemLinks " +
+                                                            "WHERE ([Source].[System.WorkItemType] = 'User Story'  " +
+                                                            "AND  [Source].[System.Id] = " + id + ") " +
+                                                            "And ([System.Links.LinkType] IN ('System.LinkTypes.Dependency-Reverse','System.LinkTypes.Dependency-Forward')) mode(MustContain)"
                                                           );
             Query wiQuery = new Query(store, queryString.ToString());
             WorkItemLinkInfo[] wiTrees = wiQuery.RunLinkQuery();
+            //var wis = wiQuery.RunQuery();
+
+            return wiTrees;
+        }
+
+        public WorkItemLinkInfo[] GetDependentItems(string ids)
+        {
+            StringBuilder queryString = new StringBuilder("SELECT [System.Id], [System.Links.LinkType], [System.WorkItemType], [System.IterationPath] " +
+                                                            "FROM WorkItemLinks " +
+                                                            "WHERE ([Source].[System.WorkItemType] = 'User Story'  " +
+                                                            "AND  [Source].[System.Id] IN (" + ids + ")) " +
+                                                            "And ([System.Links.LinkType] IN ('System.LinkTypes.Dependency-Reverse','System.LinkTypes.Dependency-Forward')) mode(MustContain)"
+                                                          );
+            Query wiQuery = new Query(store, queryString.ToString());
+            WorkItemLinkInfo[] wiTrees = wiQuery.RunLinkQuery();
+            //var wis = wiQuery.RunQuery();
 
             return wiTrees;
         }

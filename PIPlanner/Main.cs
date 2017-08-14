@@ -23,15 +23,33 @@ namespace PIPlanner
             InitializeComponent();
             var dockpanel = new DockPanel() { HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch, LastChildFill = true};
             var scroll = new ScrollViewer() {HorizontalScrollBarVisibility = ScrollBarVisibility.Auto, VerticalScrollBarVisibility = ScrollBarVisibility.Auto};
-            var stackPanel = new StackPanel();
+            var dockpanel1 = new DockPanel() { HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch, LastChildFill = true};
             var slider = CreateZoomSlider();
+            var tb = new TextBlock();
 
-            stackPanel.Children.Add(slider);
+            tb.Margin = new Thickness(8, 2, 12, 2);
+            tb.Inlines.Add(new System.Windows.Documents.Run
+            {
+                Background = System.Windows.Media.Brushes.Blue,
+                Foreground = System.Windows.Media.Brushes.White,
+                FontFamily = new System.Windows.Media.FontFamily("Comic Sans"),
+                Text = "Predecessor" + System.Environment.NewLine
+            });
+            tb.Inlines.Add(new System.Windows.Documents.Run
+            {
+                Background = System.Windows.Media.Brushes.MidnightBlue,
+                Foreground = System.Windows.Media.Brushes.Pink,
+                FontFamily = new System.Windows.Media.FontFamily("Comic Sans"),
+                Text = "Successor"
+            });
+
+            dockpanel1.Children.Add(tb);
+            dockpanel1.Children.Add(slider);
   
-            dockpanel.Children.Add(stackPanel);
+            dockpanel.Children.Add(dockpanel1);
             dockpanel.Children.Add(scroll);
             DockPanel.SetDock(scroll, System.Windows.Controls.Dock.Top);
-            DockPanel.SetDock(stackPanel, System.Windows.Controls.Dock.Bottom);
+            DockPanel.SetDock(dockpanel1, System.Windows.Controls.Dock.Bottom);
 
             scroll.Content = _table;
             elementHost1.Child = dockpanel;
@@ -141,6 +159,7 @@ namespace PIPlanner
                     sw.Start();
                     this.Cursor = Cursors.WaitCursor;
                     List<IterationSelection> selections = picker.SelectedIterations;
+                    TableHelper.LoadSuccesors = picker.LoadSuccesors;
 
                     SetIterationsGrid(selections);
 

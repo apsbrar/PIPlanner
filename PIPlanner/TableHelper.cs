@@ -20,17 +20,23 @@ namespace PIPlanner
         public static Tfs _tfs;
         public static Grid _table;
         private static Point startPoint;
+        private static List<ListViewItem> _listViewItems = null;
+        private static StringBuilder _sb = null;
 
         internal static void SetTable(List<IterationSelection> selections, Grid table, Tfs tfs)
         {
+            _listViewItems = new List<ListViewItem>();
+            _sb = new StringBuilder();
             ClearTable(table);
             System.Windows.Forms.Application.DoEvents();
             AddTeams(selections, table);
             System.Windows.Forms.Application.DoEvents();
-            
-	    List<IterationSelection> engSelections = selections.Where(sel => !sel.Platform).ToList();
+
+            List<IterationSelection> engSelections = selections.Where(sel => !sel.Platform).ToList();
             List<IterationSelection> pltfrmSelections = selections.Where(sel => sel.Platform).ToList();
             AddIterations(engSelections, pltfrmSelections, table, tfs);
+            _listViewItems.Clear();
+            _sb = null;
         }
 
         private static void ClearTable(Grid table)
@@ -47,7 +53,7 @@ namespace PIPlanner
             foreach (var selection in selections)
             {
                 if (selection.Platform) continue;
-		foreach (var subIteration in selection.SubIterations)
+                foreach (var subIteration in selection.SubIterations)
                 {
                     string subIterationText = GetIterationText(subIteration.Path);
                     if (!iterationsDict.Keys.Contains(subIterationText))
@@ -89,13 +95,13 @@ namespace PIPlanner
                     var selection = selections.FirstOrDefault(it => it.SubIterations.FirstOrDefault(sit => sit.Id == teamIteration.Id) != null);
 
                     for (int i = 0; i <= _table.RowDefinitions.Count; i++)
-			        {
+                    {
                         if (table.RowDefinitions[i].Tag == selection.Iteration)
                         {
                             row = i;
                             break;
                         }
-			        }
+                    }
 
                     var header = new TextBlock() { Tag = teamIteration, Text = teamIteration.Path, Background = Brushes.Black, Foreground = Brushes.White };
                     header.PreviewDragEnter += header_DragEnter;
@@ -111,7 +117,7 @@ namespace PIPlanner
                     List<ListViewItem> wis = new List<ListViewItem>();
                     foreach (var teamIterationWorkItem in teamIterationWorkItems)
                     {
-                        var lvi = GetLviForWi(teamIterationWorkItem);
+                        var lvi = GetLviForWi(teamIterationWorkItem, true);
                         wis.Add(lvi);
                     }
                     lv.ItemsSource = wis;
@@ -125,8 +131,8 @@ namespace PIPlanner
 
                     System.Windows.Forms.Application.DoEvents();
                 }
-		    
-		foreach (var pltfrmSel in pltfrmSelections)
+
+                foreach (var pltfrmSel in pltfrmSelections)
                 {
                     var sp = new StackPanel();
 
@@ -156,7 +162,7 @@ namespace PIPlanner
                     List<ListViewItem> wis = new List<ListViewItem>();
                     foreach (var teamIterationWorkItem in teamIterationWorkItems)
                     {
-                        var lvi = GetLviForWi(teamIterationWorkItem);
+                        var lvi = GetLviForWi(teamIterationWorkItem, true);
                         wis.Add(lvi);
                     }
 
@@ -173,6 +179,33 @@ namespace PIPlanner
                 }
 
                 column++;
+            }
+
+            SetAllDependencies();
+        }
+
+        private static void SetAllDependencies()
+        {
+            string allIds = _sb.ToString();
+            
+            if (allIds.Length > 0)
+            {
+                allIds = allIds.Remove(allIds.Length - 1);
+                var wis = _tfs.GetDependentItems(allIds);
+                string ids = "";
+
+                foreach (var lvi in _listViewItems)
+                {
+                    WorkItem teamIterationWorkItem = lvi.Tag as WorkItem;
+                    var txtBlock = (TextBlock)lvi.Content;
+                    var links = wis.Where(wi => wi.SourceId == teamIterationWorkItem.Id);
+
+                    foreach (var link in links)
+                    {
+                        CreateDependencyText(txtBlock, ref ids, link, teamIterationWorkItem);
+                        System.Windows.Forms.Application.DoEvents();
+                    }
+                }
             }
         }
 
@@ -256,44 +289,103 @@ namespace PIPlanner
             lv.Items.Refresh();
         }
 
-        public static ListViewItem GetLviForWi(WorkItem teamIterationWorkItem)
+        public static ListViewItem GetLviForWi(WorkItem teamIterationWorkItem, bool dependencyCollectMode = false)
         {
             var lvi = new ListViewItem();
-            lvi.Content = new TextBlock() { Text = teamIterationWorkItem.ToLabel(), HorizontalAlignment = HorizontalAlignment.Stretch };
+            lvi.Content = new TextBlock() { Text = teamIterationWorkItem.ToLabel(), HorizontalAlignment = HorizontalAlignment.Stretch, IsHitTestVisible = false };
             lvi.HorizontalContentAlignment = HorizontalAlignment.Stretch;
             lvi.Tag = teamIterationWorkItem;
 
-            SetDependency(teamIterationWorkItem, lvi);
+            if (!dependencyCollectMode)
+                SetDependency(teamIterationWorkItem, lvi);
+            else
+            {
+                _listViewItems.Add(lvi);
+                _sb.Append(teamIterationWorkItem.Id + ",");
+            }
 
             lvi.MouseDoubleClick += lvi_MouseDoubleClick;
             return lvi;
+        }
+
+        private static WorkItem GetWiFromBoard(int id)
+        {
+            var listViews = FindChildren<ListView>(_table);
+
+            foreach (var listView in listViews)
+            {
+                foreach (ListViewItem lvi in listView.Items)
+                {
+                    var wi = lvi.Tag as WorkItem;
+                    if (wi != null && wi.Id == id)
+                    {
+                        return wi;
+                    }
+                }
+            }
+            return null;
         }
 
         private static void SetDependency(WorkItem teamIterationWorkItem, ListViewItem lvi)
         {
             var txtBlock = (TextBlock)lvi.Content;
             string ids = "";
-            foreach (Link link in teamIterationWorkItem.Links)
+
+            var linkedWis = _tfs.GetDependentItems(teamIterationWorkItem.Id);
+
+            foreach (var link in linkedWis)
             {
-                if (link.GetType() == typeof(RelatedLink))
-                {
-                    var rel = link as RelatedLink;
-                    if (rel.LinkTypeEnd.Name == "Predecessor")
-                    {
-                        txtBlock.Text = txtBlock.Text.ToString() + System.Environment.NewLine + rel.RelatedWorkItemId;
-                        txtBlock.Background = Brushes.Pink;
-                        ids += rel.RelatedWorkItemId + " ";
-                    }
-                }
+
+                CreateDependencyText(txtBlock, ref ids, link, teamIterationWorkItem);
                 System.Windows.Forms.Application.DoEvents();
             }
 
-            if(ids != "")
+            if (ids != "")
             {
                 txtBlock.Tag = ids;
                 var cmenu = new ContextMenu();
                 txtBlock.ContextMenuOpening += txtBlock_ContextMenuOpening;
                 txtBlock.ContextMenu = cmenu;
+            }
+        }
+
+        private static void CreateDependencyText(TextBlock txtBlock, ref string ids, WorkItemLinkInfo link, WorkItem teamIterationWorkItem)
+        {
+            if (link.LinkTypeId == -3)
+            {
+                var relWi = GetWiFromBoard(link.TargetId);
+                if (relWi == null)
+                    relWi = _tfs.GetWorkItem(link.TargetId.ToString());
+                if (teamIterationWorkItem.AreaId != relWi.AreaId) // only if dependency is from another team
+                {
+                    txtBlock.Inlines.Add(new System.Windows.Documents.Run
+                    {
+                        Background = Brushes.Blue,
+                        Foreground = Brushes.White,
+                        FontFamily = new FontFamily("Comic Sans"),
+                        Text = System.Environment.NewLine + link.TargetId + " |" + relWi.Type.Name + "| " + relWi.IterationPath
+                    });
+                    txtBlock.Background = Brushes.Pink;
+                    ids += link.TargetId + " ";
+                }
+            }
+            if (link.LinkTypeId == 3 && LoadSuccesors)
+            {
+                var relWi = GetWiFromBoard(link.TargetId);
+                if (relWi == null)
+                    relWi = _tfs.GetWorkItem(link.TargetId.ToString());
+                if (teamIterationWorkItem.AreaId != relWi.AreaId) // only if dependency is from another team
+                {
+                    txtBlock.Inlines.Add(new System.Windows.Documents.Run
+                    {
+                        Background = Brushes.MidnightBlue,
+                        Foreground = Brushes.Pink,
+                        FontFamily = new FontFamily("Comic Sans"),
+                        Text = System.Environment.NewLine + link.TargetId + " |" + relWi.Type.Name + "| " + relWi.IterationPath
+                    });
+                    txtBlock.Background = Brushes.Pink;
+                    ids += link.TargetId + " ";
+                }
             }
         }
 
@@ -303,19 +395,19 @@ namespace PIPlanner
             var txtBlock = e.Source as TextBlock;
 
             string ids = txtBlock.Tag as string;
-            if(!string.IsNullOrWhiteSpace(ids))
+            if (!string.IsNullOrWhiteSpace(ids))
             {
                 var idList = ids.Split(' ');
                 var newMenu = new ContextMenu();
 
-                foreach(string id in idList)
+                foreach (string id in idList)
                 {
                     if (id.Trim() == "")
                         continue;
 
                     var mi = new MenuItem();
                     mi.Header = id;
-                    
+
                     var miOpen = new MenuItem();
                     miOpen.Header = "Open";
                     miOpen.Click += miOpen_Click;
@@ -344,14 +436,14 @@ namespace PIPlanner
                 int id = (int)src.Tag;
                 if (id > 0)
                 {
-                     var listViews = FindChildren<ListView>(_table);
+                    var listViews = FindChildren<ListView>(_table);
 
                     foreach (var listView in listViews)
                     {
                         foreach (ListViewItem lvi in listView.Items)
-	                    {
-		                    var wi = lvi.Tag as WorkItem;
-                            if(wi != null && wi.Id == id)
+                        {
+                            var wi = lvi.Tag as WorkItem;
+                            if (wi != null && wi.Id == id)
                             {
 
                                 Point pointTransformToVisual = lvi.TransformToVisual(_table).Transform(new Point());
@@ -363,7 +455,7 @@ namespace PIPlanner
                                 lvi.Focus();
                                 return;
                             }
-	                    }
+                        }
                     }
 
                     MessageBox.Show(id + " Not found on the board");
@@ -398,7 +490,7 @@ namespace PIPlanner
                     ListView lv = FindAnchestor<ListView>(lvi);
                     var wi = lvi.Tag as WorkItem;
 
-                    
+
                     int iterationIdBefore = wi.IterationId;
                     ShowWorkItem(wi);
                     wi.Save();
@@ -579,5 +671,7 @@ namespace PIPlanner
         }
 
         public static int iterationIdAfter { get; set; }
+
+        public static bool LoadSuccesors { get; set; }
     }
 }

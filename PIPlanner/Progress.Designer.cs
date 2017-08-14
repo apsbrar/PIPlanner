@@ -39,7 +39,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(395, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Please wait while PI Board is being loaded from TFS (can take 2 minutes or longer" +
+            this.label1.Text = "Please wait while PI Board is being loaded from TFS (can take 5 minutes or longer" +
     ")";
             // 
             // progressBar1
