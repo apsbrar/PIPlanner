@@ -18,12 +18,12 @@ namespace PIPlanner
         private DataSet _dataSet = null;
         int _edsIndex = 0;
 
-        public bool LoadSuccesors 
+        public bool LoadSuccesors
         {
-            get 
+            get
             {
                 return chkLoadSuccesors.Checked;
-            } 
+            }
         }
 
         public IterationPicker(Tfs tfs)
@@ -80,6 +80,16 @@ namespace PIPlanner
             else
             {
                 btnLoadPreviousFilter.Enabled = false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.LastProject) &&
+                !string.IsNullOrWhiteSpace(Properties.Settings.Default.LastSelection))
+            {
+                btnLoadSelection.Enabled = true;
+            }
+            else
+            {
+                btnLoadSelection.Enabled = false;
             }
         }
 
@@ -154,6 +164,12 @@ namespace PIPlanner
         {
             Properties.Settings.Default.LastProject = Projects.SelectedItem.ToString();
             Properties.Settings.Default.LastFilter = _grid.FilterString;
+            string selection = "";
+            foreach (var iteration in SelectedIterations)
+            {
+                selection = selection + iteration.Path + "," + iteration.Platform + ";";
+            }
+            Properties.Settings.Default.LastSelection = selection;
             Properties.Settings.Default.Save();
             this.Close();
         }
@@ -178,6 +194,36 @@ namespace PIPlanner
                 _grid.EnableFilterAndSort(_grid.Columns[0]);
                 _grid.EnableFilterAndSort(_grid.Columns[1]);
                 btnSelectAll_Click(null, null);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void btnLoadSelection_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int index = Projects.FindStringExact(Properties.Settings.Default.LastProject);
+                Projects.SelectedIndex = index;
+
+                string[] selection = Properties.Settings.Default.LastSelection.Split(';');
+
+                for (int i = 0; i < selection.Length; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(selection[i])) continue;
+                    string[] val = selection[i].Split(',');
+                    var rows = _dataTable.AsEnumerable();
+                    var incRow = rows.Where(r => r.Field<string>("Iteration") == val[0]);
+                    var row = incRow.FirstOrDefault();
+                    if (row != null)
+                    {
+                        row.SetField(0, true);
+                        row.SetField(1, val[1].ToLower() == "true");
+                    }
+                }
+
             }
             catch (Exception ex)
             {

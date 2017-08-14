@@ -38,6 +38,7 @@
             this._grid = new Zuby.ADGV.AdvancedDataGridView();
             this.bindingSource_main = new System.Windows.Forms.BindingSource(this.components);
             this.btnLoadPreviousFilter = new System.Windows.Forms.Button();
+            this.btnLoadSelection = new System.Windows.Forms.Button();
             this.chkLoadSuccesors = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this._grid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource_main)).BeginInit();
@@ -78,7 +79,7 @@
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOk.Location = new System.Drawing.Point(368, 305);
+            this.btnOk.Location = new System.Drawing.Point(368, 331);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 9;
@@ -90,7 +91,7 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(449, 305);
+            this.btnCancel.Location = new System.Drawing.Point(449, 331);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 10;
@@ -113,14 +114,14 @@
             this._grid.Name = "_grid";
             this._grid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this._grid.ShowEditingIcon = false;
-            this._grid.Size = new System.Drawing.Size(512, 260);
+            this._grid.Size = new System.Drawing.Size(512, 263);
             this._grid.TabIndex = 11;
             this._grid.FilterStringChanged += new System.EventHandler(this._grid_FilterStringChanged);
             // 
             // btnLoadPreviousFilter
             // 
             this.btnLoadPreviousFilter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnLoadPreviousFilter.Location = new System.Drawing.Point(12, 305);
+            this.btnLoadPreviousFilter.Location = new System.Drawing.Point(12, 331);
             this.btnLoadPreviousFilter.Name = "btnLoadPreviousFilter";
             this.btnLoadPreviousFilter.Size = new System.Drawing.Size(136, 23);
             this.btnLoadPreviousFilter.TabIndex = 12;
@@ -128,11 +129,22 @@
             this.btnLoadPreviousFilter.UseVisualStyleBackColor = true;
             this.btnLoadPreviousFilter.Click += new System.EventHandler(this.btnLoadPreviousFilter_Click);
             // 
+            // btnLoadSelection
+            // 
+            this.btnLoadSelection.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnLoadSelection.Location = new System.Drawing.Point(154, 331);
+            this.btnLoadSelection.Name = "btnLoadSelection";
+            this.btnLoadSelection.Size = new System.Drawing.Size(149, 23);
+            this.btnLoadSelection.TabIndex = 13;
+            this.btnLoadSelection.Text = "Load Previous Selection";
+            this.btnLoadSelection.UseVisualStyleBackColor = true;
+            this.btnLoadSelection.Click += new System.EventHandler(this.btnLoadSelection_Click);
+            // 
             // chkLoadSuccesors
             // 
             this.chkLoadSuccesors.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.chkLoadSuccesors.AutoSize = true;
-            this.chkLoadSuccesors.Location = new System.Drawing.Point(157, 309);
+            this.chkLoadSuccesors.Location = new System.Drawing.Point(368, 308);
             this.chkLoadSuccesors.Name = "chkLoadSuccesors";
             this.chkLoadSuccesors.Size = new System.Drawing.Size(106, 17);
             this.chkLoadSuccesors.TabIndex = 13;
@@ -145,7 +157,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(536, 340);
+            this.ClientSize = new System.Drawing.Size(536, 366);
+            this.Controls.Add(this.btnLoadSelection);
             this.Controls.Add(this.chkLoadSuccesors);
             this.Controls.Add(this.btnLoadPreviousFilter);
             this.Controls.Add(this._grid);
@@ -179,6 +192,7 @@
         private Zuby.ADGV.AdvancedDataGridView _grid;
         private System.Windows.Forms.BindingSource bindingSource_main;
         private System.Windows.Forms.Button btnLoadPreviousFilter;
+        private System.Windows.Forms.Button btnLoadSelection;
         private System.Windows.Forms.CheckBox chkLoadSuccesors;
     }
 }
