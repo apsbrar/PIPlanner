@@ -1,4 +1,4 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.WpfControls;
+﻿//using Microsoft.TeamFoundation.WorkItemTracking.WpfControls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +12,10 @@ using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media.Imaging;
+using System.IO;
+using System.Reflection;
+using Microsoft.Win32;
 
 namespace PIPlanner
 {
@@ -22,11 +26,13 @@ namespace PIPlanner
         private static Point startPoint;
         private static List<ListViewItem> _listViewItems = null;
         private static StringBuilder _sb = null;
+        static Dictionary<string, List<KeyValuePair<string, string>>> _dependencies = new Dictionary<string, List<KeyValuePair<string,string>>>();
 
         internal static void SetTable(List<IterationSelection> selections, Grid table, Tfs tfs)
         {
             _listViewItems = new List<ListViewItem>();
             _sb = new StringBuilder();
+            _dependencies.Clear();
             ClearTable(table);
             System.Windows.Forms.Application.DoEvents();
             AddTeams(selections, table);
@@ -344,7 +350,7 @@ namespace PIPlanner
             string ids = "";
 
             var linkedWis = _tfs.GetDependentItems(teamIterationWorkItem.Id);
-
+            
             foreach (var link in linkedWis)
             {
 
@@ -379,6 +385,12 @@ namespace PIPlanner
                     });
                     txtBlock.Background = Brushes.Pink;
                     ids += link.TargetId + " ";
+
+                    if (!_dependencies.ContainsKey(teamIterationWorkItem.AreaPath))
+                    {
+                        _dependencies.Add(teamIterationWorkItem.AreaPath, new List<KeyValuePair<string, string>>());
+                    }
+                    _dependencies[teamIterationWorkItem.AreaPath].Add(new KeyValuePair<string, string>(relWi.AreaPath, link.TargetId.ToString()));
                 }
             }
             if (link.LinkTypeId == 3 && LoadSuccesors)
@@ -544,17 +556,46 @@ namespace PIPlanner
 
         private static void ShowWorkItem(WorkItem wi, string caption = "")
         {
-            WorkItemControl witControl = new WorkItemControl();
-            witControl.Item = wi;
+            try
+            {
+                Assembly customLoadedAssembly = null;
+                string assemblyFileName = "Microsoft.TeamFoundation.WorkItemTracking.Controls.dll";
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\VisualStudio\14.0"))
+                {
+                    object obj = key.GetValue("InstallDir");
+                    string InstallFolder = obj.ToString();
+                    string privateAssembliesFolder = Path.Combine(InstallFolder, @"CommonExtensions\Microsoft\TeamFoundation\Team Explorer");
+                    string assemblyFile = Path.Combine(privateAssembliesFolder, assemblyFileName);
+                    if (File.Exists(assemblyFile))
+                    {
+                        AssemblyName assemblyName = AssemblyName.GetAssemblyName(assemblyFile);
+                        customLoadedAssembly = Assembly.Load(assemblyName);
+                    }
+                }
 
-            var container = new Window();
-            if (caption == "")
-                container.Title = wi.Id.ToString();
-            else
-                container.Title = caption;
+                if (customLoadedAssembly != null)
+                {
+                    Type witControlType = customLoadedAssembly.GetType("Microsoft.TeamFoundation.WorkItemTracking.WpfControls.WorkItemControl");
+                    dynamic witControl = Activator.CreateInstance(witControlType);
+                    witControl.Item = wi;
 
-            container.Content = witControl;
-            container.ShowDialog();
+                    var itemProperty = witControlType.GetProperty("Item");
+                    itemProperty.SetValue(witControl, wi);
+
+                    var container = new Window();
+                    if (caption == "")
+                        container.Title = wi.Id.ToString();
+                    else
+                        container.Title = caption;
+
+                    container.Content = witControl;
+                    container.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show("Error: " + ex.Message + System.Environment.NewLine + ex.StackTrace);
+            }
         }
 
         static void header_DragEnter(object sender, DragEventArgs e)
@@ -685,5 +726,81 @@ namespace PIPlanner
         public static int iterationIdAfter { get; set; }
 
         public static bool LoadSuccesors { get; set; }
+
+        public static void TakeSnapshot(string folder)
+        {
+            var sps = FindChildren<StackPanel>(_table);
+            _table.Arrange(new Rect(new Size(10,10)));
+
+            foreach (var sp in sps)
+            {
+                CreateImageFromControl(sp, folder);
+            }
+
+            _table.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            _table.Arrange(new Rect(_table.DesiredSize));
+            _table.UpdateLayout();
+        }
+
+        static void CreateImageFromControl(StackPanel stackPanel, string folder)
+        {
+            var lvs = FindChildren<ListView>(stackPanel);
+            if (lvs.Any())
+            {
+                var iteration = lvs.ElementAt(0).Tag as Iteration;
+                if (iteration != null)
+                {
+                    stackPanel.Arrange(new Rect(new Size(stackPanel.ActualWidth, stackPanel.ActualHeight)));
+                    RenderTargetBitmap renderTargetBitmap =
+                                                new RenderTargetBitmap((int)stackPanel.ActualWidth, (int)stackPanel.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+                    renderTargetBitmap.Render(stackPanel);
+                    PngBitmapEncoder pngImage = new PngBitmapEncoder();
+                    pngImage.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
+                    string path = Path.Combine(folder, iteration.Path.Replace(Path.DirectorySeparatorChar, '-') + ".png");
+                    //string directory = Path.GetDirectoryName(path);
+                    //if (!Directory.Exists(directory))
+                    //    Directory.CreateDirectory(directory);
+                    using (Stream fileStream = File.Create(path))
+                    {
+                        pngImage.Save(fileStream);
+                    }
+                }
+            }
+        }
+
+        public static void ShowDependencies()
+        {
+            //create a form 
+            System.Windows.Forms.Form form = new System.Windows.Forms.Form();
+            form.Size = new System.Drawing.Size(1200, 800);
+            //create a viewer object 
+            Microsoft.Msagl.GraphViewerGdi.GViewer viewer = new Microsoft.Msagl.GraphViewerGdi.GViewer();
+            //create a graph object 
+            Microsoft.Msagl.Drawing.Graph graph = new Microsoft.Msagl.Drawing.Graph("graph");
+            //create the graph content
+
+            foreach (var depender in _dependencies.Keys)
+            {
+                foreach (var dependentOn in _dependencies[depender])
+                {
+                    var edge = graph.AddEdge(depender, dependentOn.Key);
+                    edge.LabelText = dependentOn.Value;
+                    var md5 = System.Security.Cryptography.MD5.Create();
+                    var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(dependentOn.Value.ToString()));
+                    edge.Attr.Color = new Microsoft.Msagl.Drawing.Color(hash[0], hash[1], hash[2]);
+                    edge.Label.FontColor = new Microsoft.Msagl.Drawing.Color(hash[0], hash[1], hash[2]);
+                }
+            }
+
+            //bind the graph to the viewer 
+            viewer.Graph = graph;
+            //associate the viewer with the form 
+            form.SuspendLayout();
+            viewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            form.Controls.Add(viewer);
+            form.ResumeLayout();
+            //show the form 
+            form.ShowDialog();
+        }
     }
 }

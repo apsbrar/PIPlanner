@@ -22,7 +22,7 @@ namespace PIPlanner
         {
             get
             {
-                return chkLoadSuccesors.Checked;
+                return !chkDontLoadSuccesors.Checked;
             }
         }
 
@@ -67,6 +67,9 @@ namespace PIPlanner
 
         private void IterationPicker_Load(object sender, EventArgs e)
         {
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            this.Text = string.Format(this.Text, version.Major + "." + version.Minor + "." + version.Revision); 
+
             if (_edsIndex > 0)
             {
                 Projects.SelectedIndex = _edsIndex;
@@ -179,10 +182,10 @@ namespace PIPlanner
             this.Close();
         }
 
-        private void _grid_FilterStringChanged(object sender, EventArgs e)
-        {
-            bindingSource_main.Filter = _grid.FilterString;
-        }
+        //private void _grid_FilterStringChanged(object sender, EventArgs e)
+        //{
+        //    bindingSource_main.Filter = _grid.FilterString;
+        //}
 
         private void btnLoadPreviousFilter_Click(object sender, EventArgs e)
         {
@@ -231,5 +234,9 @@ namespace PIPlanner
             }
         }
 
+        private void _grid_FilterStringChanged(object sender, Zuby.ADGV.AdvancedDataGridView.FilterEventArgs e)
+        {
+            bindingSource_main.Filter = e.FilterString;
+        }
     }
 }
