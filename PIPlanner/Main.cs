@@ -119,6 +119,9 @@ namespace PIPlanner
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            this.Text = string.Format(this.Text, version.Major + "." + version.Minor + "." + version.Revision);
+
             var progress = new Progress();
             progress.FormClosed += progress_FormClosed;
 
@@ -202,6 +205,7 @@ namespace PIPlanner
             if (_selectedIterationsGrid.Columns.Count > 0)
             {
                 _selectedIterationsGrid.Columns["IsSelected"].Visible = false;
+                _selectedIterationsGrid.Columns["Platform"].Visible = false;
                 _selectedIterationsGrid.Columns["Iteration"].Visible = false;
                 _selectedIterationsGrid.Columns["Path"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             }
@@ -261,6 +265,38 @@ namespace PIPlanner
             btnRefresh_Click(null, null);
         }
 
+        private void btnSnapshot_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var fbd = new FolderBrowserDialog();
+                fbd.Description = "Select folder to save sprint snapshots";
+                //fbd.SelectedPath = System.Environment.SpecialFolder.MyDocuments;
+                if (fbd.ShowDialog(this) == DialogResult.OK)
+                {
+                    this.Cursor = Cursors.WaitCursor;
+                    System.Windows.Forms.Application.DoEvents();
+                    TableHelper.TakeSnapshot(fbd.SelectedPath);
+                    System.Windows.Forms.Application.DoEvents();
+                    this.Cursor = Cursors.Default;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show("Could not connect : " + ex.Message + System.Environment.NewLine + ex.StackTrace);
+            }
+        }
 
+        private void btnGraph_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                TableHelper.ShowDependencies();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show("Could not connect : " + ex.Message + System.Environment.NewLine + ex.StackTrace);
+            }
+        }
     }
 }

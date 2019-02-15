@@ -39,7 +39,7 @@
             this.bindingSource_main = new System.Windows.Forms.BindingSource(this.components);
             this.btnLoadPreviousFilter = new System.Windows.Forms.Button();
             this.btnLoadSelection = new System.Windows.Forms.Button();
-            this.chkLoadSuccesors = new System.Windows.Forms.CheckBox();
+            this.chkDontLoadSuccesors = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this._grid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource_main)).BeginInit();
             this.SuspendLayout();
@@ -48,27 +48,30 @@
             // 
             this.Projects.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.Projects.FormattingEnabled = true;
-            this.Projects.Location = new System.Drawing.Point(60, 12);
+            this.Projects.Location = new System.Drawing.Point(80, 15);
+            this.Projects.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Projects.Name = "Projects";
-            this.Projects.Size = new System.Drawing.Size(200, 21);
+            this.Projects.Size = new System.Drawing.Size(265, 24);
             this.Projects.TabIndex = 6;
             this.Projects.SelectedIndexChanged += new System.EventHandler(this.Projects_SelectedIndexChanged);
             // 
             // LabelProjects
             // 
             this.LabelProjects.AutoSize = true;
-            this.LabelProjects.Location = new System.Drawing.Point(9, 15);
+            this.LabelProjects.Location = new System.Drawing.Point(12, 18);
+            this.LabelProjects.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.LabelProjects.Name = "LabelProjects";
-            this.LabelProjects.Size = new System.Drawing.Size(45, 13);
+            this.LabelProjects.Size = new System.Drawing.Size(57, 16);
             this.LabelProjects.TabIndex = 5;
             this.LabelProjects.Text = "Projects";
             // 
             // btnSelectAll
             // 
             this.btnSelectAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelectAll.Location = new System.Drawing.Point(449, 10);
+            this.btnSelectAll.Location = new System.Drawing.Point(599, 12);
+            this.btnSelectAll.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnSelectAll.Name = "btnSelectAll";
-            this.btnSelectAll.Size = new System.Drawing.Size(75, 23);
+            this.btnSelectAll.Size = new System.Drawing.Size(100, 28);
             this.btnSelectAll.TabIndex = 8;
             this.btnSelectAll.Text = "Select All";
             this.btnSelectAll.UseVisualStyleBackColor = true;
@@ -79,9 +82,10 @@
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOk.Location = new System.Drawing.Point(368, 331);
+            this.btnOk.Location = new System.Drawing.Point(491, 407);
+            this.btnOk.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(75, 23);
+            this.btnOk.Size = new System.Drawing.Size(100, 28);
             this.btnOk.TabIndex = 9;
             this.btnOk.Text = "OK";
             this.btnOk.UseVisualStyleBackColor = true;
@@ -91,9 +95,10 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(449, 331);
+            this.btnCancel.Location = new System.Drawing.Point(599, 407);
+            this.btnCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 23);
+            this.btnCancel.Size = new System.Drawing.Size(100, 28);
             this.btnCancel.TabIndex = 10;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -110,20 +115,22 @@
             this._grid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._grid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this._grid.FilterAndSortEnabled = true;
-            this._grid.Location = new System.Drawing.Point(12, 39);
+            this._grid.Location = new System.Drawing.Point(16, 48);
+            this._grid.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this._grid.Name = "_grid";
             this._grid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this._grid.ShowEditingIcon = false;
-            this._grid.Size = new System.Drawing.Size(512, 263);
+            this._grid.Size = new System.Drawing.Size(683, 324);
             this._grid.TabIndex = 11;
-            this._grid.FilterStringChanged += new System.EventHandler(this._grid_FilterStringChanged);
+            this._grid.FilterStringChanged += new System.EventHandler<Zuby.ADGV.AdvancedDataGridView.FilterEventArgs>(this._grid_FilterStringChanged);
             // 
             // btnLoadPreviousFilter
             // 
             this.btnLoadPreviousFilter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnLoadPreviousFilter.Location = new System.Drawing.Point(12, 331);
+            this.btnLoadPreviousFilter.Location = new System.Drawing.Point(16, 407);
+            this.btnLoadPreviousFilter.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnLoadPreviousFilter.Name = "btnLoadPreviousFilter";
-            this.btnLoadPreviousFilter.Size = new System.Drawing.Size(136, 23);
+            this.btnLoadPreviousFilter.Size = new System.Drawing.Size(181, 28);
             this.btnLoadPreviousFilter.TabIndex = 12;
             this.btnLoadPreviousFilter.Text = "Load Previous Filter";
             this.btnLoadPreviousFilter.UseVisualStyleBackColor = true;
@@ -132,34 +139,36 @@
             // btnLoadSelection
             // 
             this.btnLoadSelection.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnLoadSelection.Location = new System.Drawing.Point(154, 331);
+            this.btnLoadSelection.Location = new System.Drawing.Point(205, 407);
+            this.btnLoadSelection.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnLoadSelection.Name = "btnLoadSelection";
-            this.btnLoadSelection.Size = new System.Drawing.Size(149, 23);
+            this.btnLoadSelection.Size = new System.Drawing.Size(199, 28);
             this.btnLoadSelection.TabIndex = 13;
             this.btnLoadSelection.Text = "Load Previous Selection";
             this.btnLoadSelection.UseVisualStyleBackColor = true;
             this.btnLoadSelection.Click += new System.EventHandler(this.btnLoadSelection_Click);
             // 
-            // chkLoadSuccesors
+            // chkDontLoadSuccesors
             // 
-            this.chkLoadSuccesors.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkLoadSuccesors.AutoSize = true;
-            this.chkLoadSuccesors.Location = new System.Drawing.Point(368, 308);
-            this.chkLoadSuccesors.Name = "chkLoadSuccesors";
-            this.chkLoadSuccesors.Size = new System.Drawing.Size(106, 17);
-            this.chkLoadSuccesors.TabIndex = 13;
-            this.chkLoadSuccesors.Text = "Show Succesors";
-            this.chkLoadSuccesors.UseVisualStyleBackColor = true;
+            this.chkDontLoadSuccesors.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkDontLoadSuccesors.AutoSize = true;
+            this.chkDontLoadSuccesors.Location = new System.Drawing.Point(464, 380);
+            this.chkDontLoadSuccesors.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkDontLoadSuccesors.Name = "chkDontLoadSuccesors";
+            this.chkDontLoadSuccesors.Size = new System.Drawing.Size(168, 20);
+            this.chkDontLoadSuccesors.TabIndex = 13;
+            this.chkDontLoadSuccesors.Text = "Don\'t Show Successors";
+            this.chkDontLoadSuccesors.UseVisualStyleBackColor = true;
             // 
             // IterationPicker
             // 
             this.AcceptButton = this.btnOk;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(536, 366);
+            this.ClientSize = new System.Drawing.Size(715, 450);
             this.Controls.Add(this.btnLoadSelection);
-            this.Controls.Add(this.chkLoadSuccesors);
+            this.Controls.Add(this.chkDontLoadSuccesors);
             this.Controls.Add(this.btnLoadPreviousFilter);
             this.Controls.Add(this._grid);
             this.Controls.Add(this.btnCancel);
@@ -168,12 +177,13 @@
             this.Controls.Add(this.Projects);
             this.Controls.Add(this.LabelProjects);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "IterationPicker";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Iteration Picker";
+            this.Text = "PI Planner {0}";
             this.Load += new System.EventHandler(this.IterationPicker_Load);
             ((System.ComponentModel.ISupportInitialize)(this._grid)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource_main)).EndInit();
@@ -193,6 +203,6 @@
         private System.Windows.Forms.BindingSource bindingSource_main;
         private System.Windows.Forms.Button btnLoadPreviousFilter;
         private System.Windows.Forms.Button btnLoadSelection;
-        private System.Windows.Forms.CheckBox chkLoadSuccesors;
+        private System.Windows.Forms.CheckBox chkDontLoadSuccesors;
     }
 }
